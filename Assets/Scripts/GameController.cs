@@ -43,13 +43,16 @@ public class GameController : MonoBehaviour
 
         GridEditor();
         DrawWalls();
-        //DrawLines(turningPoints, playerCube);
+
+        AddEndPoint();
+        DrawLines(turningPoints, playerCube);
+        
+        PrintMatrix();
     }
 
     private void GridEditor()
     {
         Material planeGridMaterial = planeMeshRender.material;
-
         planeGridMaterial.mainTextureScale = new Vector2(M, N);
     }
 
@@ -61,8 +64,35 @@ public class GameController : MonoBehaviour
         AddCornerPoints(cornerPoints, cornerMatrixIndexs);
 
         DrawLines(cornerPoints, wallCube);
+    }
 
-        PrintMatrix();
+    private void AddEndPoint()
+    {
+        int lenght = turningPoints.Count;
+
+        //the list must have at least two items
+        if (lenght >= 2)
+        {
+            Vector2Int otherPoint = turningPoints[lenght - 2];
+            Vector2Int lastPoint = turningPoints[lenght - 1];
+
+            if (lastPoint.x == otherPoint.x) //vertical line
+            {
+                if (lastPoint.y > otherPoint.y)
+                    ++lastPoint.y;
+                else
+                    --lastPoint.y;
+            }
+            else if (lastPoint.y == otherPoint.y) //vertical line
+            {
+                if (lastPoint.x > otherPoint.x)
+                    ++lastPoint.x;
+                else
+                    --lastPoint.x;
+            }
+
+            turningPoints[lenght - 1] = lastPoint;
+        }
     }
 
     private void AddCornerPoints(List<Vector2Int> cornerPoints, List<Vector2Int> cornerMatrixIndexs)
