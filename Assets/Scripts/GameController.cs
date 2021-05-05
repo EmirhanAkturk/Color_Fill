@@ -10,17 +10,19 @@ public class GameController : MonoBehaviour
         Painted = 2,
     }
 
-    [SerializeField]
-    MeshRenderer planeMeshRender;
+    [Header("Plane values")]
 
-    //x = 0, y = 0 sol alt
-    //MxN matris için
-    // arr[m][n]
+    //x = 0, y = 0 bottom left
+    //For matrix A of MxN dimensions
+    // A[m][n]
     // m = M - y - 1
     // n = x
     [Tooltip("Number of rows and columns of the matrix")]
     [SerializeField] 
     int M, N;
+
+    [SerializeField]
+    MeshRenderer planeMeshRender;
 
     [Header("Cubes")]
     [SerializeField] 
@@ -30,24 +32,48 @@ public class GameController : MonoBehaviour
 
     [SerializeField] 
     Transform parentCubes;
-
+    
     [SerializeField] 
-    List<Vector2Int> turningPoints;
+    List<Vector2Int> turningPoints, turningPoints2;
 
+    List<GameObject> playerCubes;
     TileStatus[ , ] status;
 
     // Start is called before the first frame update
     private void Start()
     {
+        playerCubes = new List<GameObject>();
         status = new TileStatus[M, N];
 
         GridEditor();
         DrawWalls();
 
-        AddEndPoint();
+        AddEndPoint(turningPoints);
         DrawLines(turningPoints, playerCube);
-        
+
+        AddEndPoint(turningPoints2);
+        DrawLines(turningPoints2, wallCube);
+
+        FillWithCubes();
         PrintMatrix();
+    }
+
+    //it may be unnecessary
+    private void FillWithCubes()
+    {
+        Vector2Int matrixIndex; // cube matrix index
+        Vector2Int position; //cube position
+
+        for (int i = 0; i< turningPoints.Count; ++i)
+        {
+            matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
+            if (matrixIndex.x < M-1)
+                ++matrixIndex.x;
+
+            if (matrixIndex.y < N-1)
+                ++matrixIndex.y;
+            boundaryFill4(matrixIndex.x, matrixIndex.y, TileStatus.Painted, TileStatus.Wall);
+        }
     }
 
     private void GridEditor()
@@ -66,7 +92,7 @@ public class GameController : MonoBehaviour
         DrawLines(cornerPoints, wallCube);
     }
 
-    private void AddEndPoint()
+    private void AddEndPoint(List<Vector2Int> turningPoints)
     {
         int lenght = turningPoints.Count;
 
@@ -135,6 +161,7 @@ public class GameController : MonoBehaviour
         {
             int upperBound;
             int lowerBound;
+
             if (p2.y < p1.y)
             {
                 ++p2.y;
@@ -158,9 +185,11 @@ public class GameController : MonoBehaviour
 
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
 
-                if (cube.tag == "PlayerCube")
+                if (cube.tag == "PlayerCube") 
+                {
+                    playerCubes.Add(newCube);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Painted;
-
+                }
                 else if (cube.tag == "WallCube")
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
             }
@@ -169,6 +198,7 @@ public class GameController : MonoBehaviour
         {
             int upperBound;
             int lowerBound;
+
             if (p2.x < p1.x)
             {
                 ++p2.x;
@@ -193,8 +223,10 @@ public class GameController : MonoBehaviour
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
 
                 if (cube.tag == "PlayerCube")
+                {
+                    playerCubes.Add(newCube);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Painted;
-
+                }
                 else if (cube.tag == "WallCube")
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
             }
@@ -226,5 +258,26 @@ public class GameController : MonoBehaviour
 
             Debug.Log("####################################");
         }
+    }
+
+    private void boundaryFill4(int m, int n, TileStatus fill_color, TileStatus boundary_color)
+    {
+        if (status[m, n] != TileStatus.Wall &&
+            status[m, n] != fill_color)
+        {
+            FillWithCube(m, n, fill_color);
+
+            boundaryFill4(m + 1, n, fill_color, boundary_color);
+            boundaryFill4(m, n + 1, fill_color, boundary_color);
+            boundaryFill4(m - 1, n, fill_color, boundary_color);
+            boundaryFill4(m, n - 1, fill_color, boundary_color);
+        }
+    }
+
+    private void FillWithCube(int m, int n, TileStatus fill_color)
+    {
+        status[m, n] = fill_color;
+        Vector2Int position = ConvertMatrixIndexToPosition(new Vector2Int(m, n));
+        Instantiate(playerCube, new Vector3(position.x, 0, position.y), Quaternion.identity);
     }
 }
