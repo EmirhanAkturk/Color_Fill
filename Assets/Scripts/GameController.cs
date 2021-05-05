@@ -10,6 +10,8 @@ public class GameController : MonoBehaviour
         Filled = 2,
     }
 
+    public static GameController instance;
+
     [Header("Plane values")]
 
     //x = 0, y = 0 bottom left
@@ -38,6 +40,22 @@ public class GameController : MonoBehaviour
 
     List<GameObject> playerCubes;
     TileStatus[ , ] status;
+    
+    public int GetM() { return M; }
+    public int GetN() { return N; }
+
+    public TileStatus GetTileStatus(Vector2Int matrixIndex)
+    {
+        return status[matrixIndex.x, matrixIndex.y];
+    }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+            Destroy(gameObject);
+        else
+            instance = this;
+    }
 
     // Start is called before the first frame update
     private void Start()
@@ -55,7 +73,7 @@ public class GameController : MonoBehaviour
         DrawLines(turningPoints2, wallCube);
 
         FillWithCubes();
-        PrintMatrix();
+        //PrintMatrix();
     }
 
     private void GridEditor()
@@ -215,14 +233,14 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
+    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
     {
         // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
         Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
         return matrixIndex;
     }
-    
-    private Vector2Int ConvertMatrixIndexToPosition(Vector2Int matrixIndex)
+
+    public Vector2Int ConvertMatrixIndexToPosition(Vector2Int matrixIndex)
     {
         // (x, y) = (n, M - m - 1) // (MxN matrix) 
         Vector2Int positionIndex = new Vector2Int(matrixIndex.y, M - matrixIndex.x - 1 );
