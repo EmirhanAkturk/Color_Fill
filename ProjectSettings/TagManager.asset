@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PlayerCube
+  - WallCube
+  - EnemyCube
   layers:
   - Default
   - TransparentFX
