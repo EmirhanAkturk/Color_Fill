@@ -835,7 +835,7 @@ MonoBehaviour:
   M: 20
   N: 20
   planeMeshRender: {fileID: 2128002694}
-  playerCube: {fileID: 6169623734096852669, guid: 0d8e3b8f60f2b124dad90779c766b659,
+  fillingCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
     type: 3}
   wallCube: {fileID: 6169623734096852669, guid: 66dbbd440c3f50f4dbd588ee452b526a,
     type: 3}

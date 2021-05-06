@@ -23,21 +23,24 @@ public class FillingCubePool : MonoBehaviour
             Destroy(gameObject);
         else
             instance = this;
+
+        // Allocate memory for th list
+        MemoryAllocate();
+
+        FillList();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void MemoryAllocate()
     {
         M = GameController.instance.GetM();
         N = GameController.instance.GetN();
 
         //allocate memory as many as the number of max trail cube.
-        fillingCubes = new List<GameObject>((M-1) * (N-1));
-
-        TrailCubeGenerator();
+        fillingCubes = new List<GameObject>((M - 1) * (N - 1));
     }
 
-    private void TrailCubeGenerator()
+
+    private void FillList()
     {
         int length = fillingCubes.Capacity;
 

@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 6169623734096852667}
   - component: {fileID: 6169623734096852668}
   m_Layer: 0
-  m_Name: Trail Cube
-  m_TagString: PlayerCube
+  m_Name: Filling Cube
+  m_TagString: FillingCube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

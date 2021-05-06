@@ -112,6 +112,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 newMovePosition = currentMovePosition;
+                moveDirection = MoveDirection.None;
             }
         }
     }
@@ -130,12 +131,14 @@ public class PlayerController : MonoBehaviour
 
         if (isTileWall || isTileFilled) 
         {
+            AddCubeToTrail(currentMovePosition);
             UpdateTail();
             
             if (!turningPoints.Contains(currentPosition))
                 turningPoints.Add(currentPosition);
 
-            //GameController.instance.FillWithCubes(turningPoints);
+            //GameController.instance.AddEndPoint(turningPoints);
+            GameController.instance.FillWithCubes(turningPoints);
         }
     }
 
@@ -143,7 +146,9 @@ public class PlayerController : MonoBehaviour
     {
         Vector2Int cubePosition;
         Vector2Int matrixIndex;
-
+        Debug.Log("###############################");
+        GameController.instance.PrintMatrix();
+        Debug.Log("###############################");
         foreach (GameObject cube in tailCubes)
         {
             cubePosition = new Vector2Int((int)cube.transform.position.x, (int)cube.transform.position.z);
@@ -153,6 +158,10 @@ public class PlayerController : MonoBehaviour
             cube.transform.localScale = fillingCubeScale;
         }
 
+        Debug.Log("###############################");
+
+        GameController.instance.PrintMatrix();
+        Debug.Log("###############################");
         tailCubes.Clear();
     }
 

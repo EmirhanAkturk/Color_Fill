@@ -29,7 +29,7 @@ public class GameController : MonoBehaviour
 
     [Header("Cubes")]
     [SerializeField] 
-    GameObject playerCube;
+    GameObject fillingCube;
 
     [SerializeField]
     GameObject wallCube;
@@ -105,12 +105,12 @@ public class GameController : MonoBehaviour
         DrawWalls();
 
         //AddEndPoint(turningPoints);
-        //DrawLines(turningPoints, playerCube, false);
+        //DrawLines(turningPoints, fillingCube, false);
 
         //AddEndPoint(turningPoints2);
         DrawLines(turningPoints2, wallCube, false);
 
-        //FillWithCubes();
+        //FillWithCubes(turningPoints);
         //PrintMatrix();
     }
 
@@ -164,7 +164,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void AddEndPoint(List<Vector2Int> turningPoints)
+    public void AddEndPoint(List<Vector2Int> turningPoints)
     {
         int lenght = turningPoints.Count;
 
@@ -225,7 +225,6 @@ public class GameController : MonoBehaviour
 
                 CreateCube(cube, ref point, ref newCube, matrixIndex);
 
-                newCube.transform.parent = cubesParent;
             }
         }
         else if(p1.y == p2.y)
@@ -255,18 +254,17 @@ public class GameController : MonoBehaviour
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
                 
                 CreateCube(cube, ref point, ref newCube, matrixIndex);
-
-                newCube.transform.parent = cubesParent;
             }
         }
     }
 
     private void CreateCube(GameObject cube, ref Vector2Int point, ref GameObject newCube, Vector2Int matrixIndex)
     {
-        if (cube.tag == "PlayerCube")
+        if (cube.tag == "FillingCube")
         {
-            newCube = FillingCubePool.instance.GetFillingCube();
-            newCube.transform.position = new Vector3(point.x, 0, point.y);
+            newCube = Instantiate(fillingCube, new Vector3(point.x, 0, point.y), Quaternion.identity);
+            //newCube = FillingCubePool.instance.GetFillingCube();
+            //newCube.transform.position = new Vector3(point.x, 0, point.y);
             status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
         }
         else if (cube.tag == "WallCube")
@@ -274,37 +272,15 @@ public class GameController : MonoBehaviour
             newCube = Instantiate(cube, new Vector3(point.x, 0, point.y), Quaternion.identity);
             status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
         }
-    }
+        
+        newCube.transform.parent = cubesParent;
 
-    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
-    {
-        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
-        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
-        return matrixIndex;
-    }
-
-    public Vector2Int ConvertMatrixIndexToPosition(Vector2Int matrixIndex)
-    {
-        // (x, y) = (n, M - m - 1) // (MxN matrix) 
-        Vector2Int positionIndex = new Vector2Int(matrixIndex.y, M - matrixIndex.x - 1 );
-        return positionIndex;
-    }
-
-    private void PrintMatrix()
-    {
-        for (int i = 0; i < M; ++i)
-        {
-            Debug.Log((i + 1) + ". satır:");
-
-            for (int j = 0; j < N; ++j)
-                Debug.Log(status[i, j]);
-
-            Debug.Log("####################################");
-        }
     }
 
     public void FillWithCubes(List<Vector2Int> turningPoints)
     {
+        AddEndPoint(turningPoints);
+
         Vector2Int matrixIndex; // cube matrix index
 
         for (int i = 0; i < turningPoints.Count; ++i)
@@ -347,4 +323,38 @@ public class GameController : MonoBehaviour
         newCube.transform.position = new Vector3(position.x, 0, position.y);
         newCube.transform.parent = cubesParent;
     }
+
+
+    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
+    {
+        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
+        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
+        return matrixIndex;
+    }
+
+    public Vector2Int ConvertMatrixIndexToPosition(Vector2Int matrixIndex)
+    {
+        // (x, y) = (n, M - m - 1) // (MxN matrix) 
+        Vector2Int positionIndex = new Vector2Int(matrixIndex.y, M - matrixIndex.x - 1);
+        return positionIndex;
+    }
+
+    public void PrintMatrix()
+    {
+        for (int i = 0; i < M; ++i)
+        {
+            if (i == 18)
+            { 
+
+            Debug.Log((i + 1) + ". satır:");
+
+            for (int j = 0; j < N; ++j)
+                Debug.Log(status[i, j]);
+
+            Debug.Log("####################################");
+            
+            }
+        }
+    }
+
 }
