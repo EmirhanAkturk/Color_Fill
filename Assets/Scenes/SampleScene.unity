@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44300658, g: 0.4921953, b: 0.57192475, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 1811307097e8cac419465ddb10b16821,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -153,9 +154,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 2078270710}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &313081394
 PrefabInstance:
@@ -240,13 +242,8 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
       propertyPath: moveTime
-      value: 5
+      value: 7.5
       objectReference: {fileID: 0}
-    - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
-      propertyPath: trailCube
-      value: 
-      objectReference: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
-        type: 3}
     - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
       propertyPath: cubesParent
       value: 
@@ -491,13 +488,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: 0.62088513, y: -0.19826688, z: 0.16636564, w: 0.7399422}
+  m_LocalRotation: {x: 0.48296294, y: -0.22414385, z: 0.1294095, w: 0.8365163}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 80, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: -30, z: 0}
 --- !u!4 &815226139 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6169623734096852665, guid: 66dbbd440c3f50f4dbd588ee452b526a,
@@ -844,9 +841,9 @@ MonoBehaviour:
     type: 3}
   cubesParent: {fileID: 143533947}
   turningPoints:
-  - {x: 11, y: 1}
-  - {x: 11, y: 10}
-  - {x: 19, y: 10}
+  - {x: 10, y: 1}
+  - {x: 10, y: 11}
+  - {x: 18, y: 11}
   turningPoints2:
   - {x: 12, y: 5}
   - {x: 18, y: 5}
@@ -865,7 +862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00c849bbcceadd44c8e53948da953869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trailCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
+  fillingCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
     type: 3}
   cubesParent: {fileID: 2078270710}
 --- !u!4 &1263962923 stripped
@@ -1118,7 +1115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2078270710}
   m_Layer: 0
-  m_Name: Trail Cube Pool Parent
+  m_Name: Filling Cube Pool Parent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1131,12 +1128,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2078270709}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_Father: {fileID: 143533947}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2128002691
 GameObject:

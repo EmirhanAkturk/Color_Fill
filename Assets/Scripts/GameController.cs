@@ -7,7 +7,8 @@ public class GameController : MonoBehaviour
     public enum TileStatus{
         Empty = 0,
         Wall = 1,
-        Filled = 2,
+        BeingFilled = 2,
+        Filled = 3,
     }
 
     public static GameController instance;
@@ -29,6 +30,7 @@ public class GameController : MonoBehaviour
     [Header("Cubes")]
     [SerializeField] 
     GameObject playerCube;
+
     [SerializeField]
     GameObject wallCube;
 
@@ -58,6 +60,15 @@ public class GameController : MonoBehaviour
         status[matrixIndex.x, matrixIndex.y] = TileStatus.Empty;
     }    
   
+    public bool IsTileBeingFilled(Vector2Int matrixIndex)
+    {
+        return status[matrixIndex.x, matrixIndex.y] == TileStatus.BeingFilled;
+    }    
+    public void SetTileBeingFilled(Vector2Int matrixIndex)
+    {
+        status[matrixIndex.x, matrixIndex.y] = TileStatus.BeingFilled;
+    }      
+    
     public bool IsTileFilled(Vector2Int matrixIndex)
     {
         return status[matrixIndex.x, matrixIndex.y] == TileStatus.Filled;
@@ -144,7 +155,7 @@ public class GameController : MonoBehaviour
 
     private void DrawLines(List<Vector2Int>points, GameObject cube, bool isWall)
     {
-        if(!isWall)
+        if (!isWall)
             AddEndPoint(points);
 
         for (int i = 0; i < (points.Count - 1); ++i)
@@ -205,24 +216,14 @@ public class GameController : MonoBehaviour
                 lowerBound = p1.y;
             }
 
-            for (int i = lowerBound ; i <= upperBound; ++i) 
+            for (int i = lowerBound ; i <= upperBound; ++i)
             {
                 point.x = p1.x;
                 point.y = i;
 
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
 
-                if (cube.tag == "PlayerCube") 
-                {
-                    newCube = TrailCubePool.instance.GetTrailCube();
-                    newCube.transform.position = new Vector3(p1.x, 0, i);
-                    status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
-                }
-                else if (cube.tag == "WallCube")
-                {
-                    newCube = Instantiate(cube, new Vector3(p1.x, 0, i), Quaternion.identity);
-                    status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
-                }
+                CreateCube(cube, ref point, ref newCube, matrixIndex);
 
                 newCube.transform.parent = cubesParent;
             }
@@ -252,21 +253,26 @@ public class GameController : MonoBehaviour
                 point.y = p1.y;
 
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
-
-                if (cube.tag == "PlayerCube")
-                {
-                    newCube = TrailCubePool.instance.GetTrailCube();
-                    newCube.transform.position = new Vector3(i, 0, p1.y);
-                    status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
-                }
-                else if (cube.tag == "WallCube")
-                {
-                    newCube = Instantiate(cube, new Vector3(i, 0, p1.y), Quaternion.identity);
-                    status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
-                }
                 
+                CreateCube(cube, ref point, ref newCube, matrixIndex);
+
                 newCube.transform.parent = cubesParent;
             }
+        }
+    }
+
+    private void CreateCube(GameObject cube, ref Vector2Int point, ref GameObject newCube, Vector2Int matrixIndex)
+    {
+        if (cube.tag == "PlayerCube")
+        {
+            newCube = FillingCubePool.instance.GetFillingCube();
+            newCube.transform.position = new Vector3(point.x, 0, point.y);
+            status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
+        }
+        else if (cube.tag == "WallCube")
+        {
+            newCube = Instantiate(cube, new Vector3(point.x, 0, point.y), Quaternion.identity);
+            status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
         }
     }
 
@@ -336,7 +342,7 @@ public class GameController : MonoBehaviour
     {
         status[m, n] = fill_color;
         Vector2Int position = ConvertMatrixIndexToPosition(new Vector2Int(m, n));
-        GameObject newCube = TrailCubePool.instance.GetTrailCube();
+        GameObject newCube = FillingCubePool.instance.GetFillingCube();
 
         newCube.transform.position = new Vector3(position.x, 0, position.y);
         newCube.transform.parent = cubesParent;

@@ -60,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9daa1b6d9c35df947b701e68c047962a, type: 2}
+  - {fileID: 2100000, guid: ae37d89e7da174d4c874c5f71942d715, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,4 +106,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4086018d22eb44c408a856fe8a59ec68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 4
+  moveTime: 5
+  cubesParent: {fileID: 0}
+  fillingCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
+    type: 3}
+  tailCubeScale: {x: 0.9, y: 0.5, z: 0.9}
+  fillingCubeScale: {x: 0.9, y: 0.9, z: 0.9}

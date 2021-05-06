@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrailCubePool : MonoBehaviour
+public class FillingCubePool : MonoBehaviour
 {
 
-    public static TrailCubePool instance;
+    public static FillingCubePool instance;
 
     [SerializeField]
-    GameObject trailCube;
+    GameObject fillingCube;
     
     [SerializeField]
     Transform cubesParent;
 
-    List<GameObject> trailCubes;
+    List<GameObject> fillingCubes;
     int M;
     int N;
 
@@ -32,45 +32,45 @@ public class TrailCubePool : MonoBehaviour
         N = GameController.instance.GetN();
 
         //allocate memory as many as the number of max trail cube.
-        trailCubes = new List<GameObject>((M-1) * (N-1));
+        fillingCubes = new List<GameObject>((M-1) * (N-1));
 
         TrailCubeGenerator();
     }
 
     private void TrailCubeGenerator()
     {
-        int length = trailCubes.Capacity;
+        int length = fillingCubes.Capacity;
 
         GameObject newCube;
 
         for (int i = 0; i < length; ++i)
         {
-            newCube = Instantiate(trailCube, Vector3.zero, Quaternion.identity);
+            newCube = Instantiate(fillingCube, Vector3.zero, Quaternion.identity);
             newCube.SetActive(false);
             newCube.transform.parent = cubesParent;
 
-            trailCubes.Add(newCube);
+            fillingCubes.Add(newCube);
         }
     }
 
-    public GameObject GetTrailCube()
+    public GameObject GetFillingCube()
     {
-        if(trailCubes.Count == 0)// trailCubes[0] == null)
+        if(fillingCubes.Count == 0)
         {
             GameObject newCube;
 
-            newCube = Instantiate(trailCube, Vector3.zero, Quaternion.identity);
+            newCube = Instantiate(fillingCube, Vector3.zero, Quaternion.identity);
             newCube.SetActive(false);
             newCube.transform.parent = cubesParent;
 
-            trailCubes.Add(newCube);
+            fillingCubes.Add(newCube);
         }
 
-        GameObject usingCube = trailCubes[0];
+        GameObject usingCube = fillingCubes[0];
         usingCube.SetActive(true);
 
-        trailCubes.RemoveAt(0);
-        trailCubes.Add(usingCube);
+        fillingCubes.RemoveAt(0);
+        fillingCubes.Add(usingCube);
 
         return usingCube;
     }
