@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
         MoveRight = 4,
     }
 
+    [Header("Player Movement")]
+    [SerializeField]
+    float moveTime = 4;
+
     [Header("Cubes")]
     [SerializeField]
     Transform cubesParent;
@@ -21,25 +25,28 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     GameObject trailCube;
 
+    [Header("Colors")]
     [SerializeField]
-    float moveTime = 4;
+    Color darkBlue;
 
-    private float distance = 20;
-    private MoveDirection moveDirection;
+    [SerializeField]
+    Color lightBlue;
+
+    private float swipeLimitDistance = 20;
+    private MoveDirection moveDirection = MoveDirection.MoveUp;
 
     private Vector2 startTouchPosition, currentTouchPosition;
     private Vector3 newMovePosition;
     
     private List<Vector2Int> turningPoints;
-    private List<GameObject> trailCubes;
-
+    private List<GameObject> tailCubes;
 
     private void Start()
     {
         turningPoints = new List<Vector2Int>();
-        trailCubes = new List<GameObject>();
+        tailCubes = new List<GameObject>();
 
-        newMovePosition = gameObject.transform.position;
+        //newMovePosition = gameObject.transform.position;
     }
 
     private void Update()
@@ -54,31 +61,36 @@ public class PlayerController : MonoBehaviour
 
         if (newMovePosition == currentMovePosition)
         {
-            AddCubeToTrail(currentMovePosition);
-
-            switch (moveDirection)
+            //check for hitting the tail
+            if (!DidHitTail(currentMovePosition))
             {
-                case MoveDirection.MoveUp:
-                    newMovePosition = currentMovePosition + Vector3.forward;
-                    break;
+                AddCubeToTrail(currentMovePosition);
 
-                case MoveDirection.MoveDown:
-                    newMovePosition = currentMovePosition + Vector3.back;
-                    break;
+                switch (moveDirection)
+                {
+                    case MoveDirection.MoveUp:
+                        newMovePosition = currentMovePosition + Vector3.forward;
+                        break;
 
-                case MoveDirection.MoveLeft:
-                    newMovePosition = currentMovePosition + Vector3.left;
-                    break;
+                    case MoveDirection.MoveDown:
+                        newMovePosition = currentMovePosition + Vector3.back;
+                        break;
 
-                case MoveDirection.MoveRight:
-                    newMovePosition = currentMovePosition + Vector3.right;
-                    break;
+                    case MoveDirection.MoveLeft:
+                        newMovePosition = currentMovePosition + Vector3.left;
+                        break;
 
-                default:
-                    newMovePosition = currentMovePosition;
-                    break;
+                    case MoveDirection.MoveRight:
+                        newMovePosition = currentMovePosition + Vector3.right;
+                        break;
+
+                    default:
+                        newMovePosition = currentMovePosition;
+                        break;
+                }
             }
-
+            else
+                moveDirection = MoveDirection.None;
         }
         else {
 
@@ -99,6 +111,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    //check for hitting the tail
+    private bool DidHitTail(Vector3 currentPosition)
+    {
+        for(int i = 0; i< tailCubes.Count - 1; ++i)
+        {
+            ////The player's cube crashed into its tail.
+            if (tailCubes[i].transform.position == currentPosition) 
+            {
+                HittedTail();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void HittedTail()
+    {
+        foreach (GameObject cube in tailCubes)
+            cube.SetActive(false);
+
+        tailCubes.Clear();
+        GameController.instance.IsGameFinished = true;
+    }
+
     private void AddCubeToTrail(Vector3 cubePosition)
     {
         Vector2Int position = new Vector2Int((int)cubePosition.x, (int)cubePosition.z);
@@ -109,7 +147,7 @@ public class PlayerController : MonoBehaviour
             GameObject newCube = TrailCubePool.instance.GetTrailCube();
             newCube.transform.position = cubePosition;
            
-            trailCubes.Add(newCube);
+            tailCubes.Add(newCube);
             newCube.transform.parent = cubesParent;
             
             GameController.instance.SetTileFilled(matrixIndex);
@@ -136,7 +174,7 @@ public class PlayerController : MonoBehaviour
                      moveDirection != MoveDirection.MoveRight)
                 {
                     //If the swipe distance is more than the limit value, the swipe is applied.
-                    if (horizontalDistance >= GetLimitDistance(false, distance))
+                    if (horizontalDistance >= GetLimitDistance(false, swipeLimitDistance))
                     {
                         // swipe right
                         if (currentTouchPosition.x > startTouchPosition.x)
@@ -147,6 +185,7 @@ public class PlayerController : MonoBehaviour
                             moveDirection = MoveDirection.MoveLeft;
 
                         startTouchPosition = currentTouchPosition;
+                        AddTurningPoint();
                     }
                 }
             }
@@ -154,7 +193,7 @@ public class PlayerController : MonoBehaviour
             else if (moveDirection != MoveDirection.MoveUp &&
                      moveDirection != MoveDirection.MoveDown)
             {
-                if (verticleDistance >= GetLimitDistance(true, distance))
+                if (verticleDistance >= GetLimitDistance(true, swipeLimitDistance))
                 {
                     if (currentTouchPosition.y > startTouchPosition.y) // swipe up
                         moveDirection = MoveDirection.MoveUp;
@@ -163,10 +202,28 @@ public class PlayerController : MonoBehaviour
                         moveDirection = MoveDirection.MoveDown;
 
                     startTouchPosition = currentTouchPosition;
+                    AddTurningPoint();
                 }
             }
         }
         
+    }
+
+    private void AddTurningPoint()
+    {
+        Vector3 currentPosition = gameObject.transform.position;
+        Vector2Int newTurningPosition = new Vector2Int((int)currentPosition.x, (int)currentPosition.z);
+
+        if (turningPoints.Count > 0) { 
+            int lastIndex = turningPoints.Count - 1;
+            bool isPointAlreadyAdded = turningPoints[lastIndex] == newTurningPosition;
+            
+            if(!isPointAlreadyAdded)
+                turningPoints.Add(newTurningPosition);
+        }
+        else
+            turningPoints.Add(newTurningPosition);
+
     }
 
     private float GetLimitDistance(bool isVerticle, float distance)

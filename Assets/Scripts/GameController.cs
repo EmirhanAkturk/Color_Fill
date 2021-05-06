@@ -40,8 +40,12 @@ public class GameController : MonoBehaviour
 
     //List<GameObject> playerCubes;
     TileStatus[ , ] status;
+    bool isGameFinished; // todo it can be with Unity event
 
     #region Getters - Setters
+
+    public bool IsGameFinished { get => isGameFinished; set => isGameFinished = value; }
+
     public int GetM() { return M; }
     public int GetN() { return N; }
 
@@ -293,7 +297,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void FillWithCubes()
+    public void FillWithCubes(List<Vector2Int> turningPoints)
     {
         Vector2Int matrixIndex; // cube matrix index
 

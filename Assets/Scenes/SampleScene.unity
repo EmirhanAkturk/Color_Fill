@@ -239,6 +239,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
+      propertyPath: moveTime
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
       propertyPath: trailCube
       value: 
       objectReference: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
