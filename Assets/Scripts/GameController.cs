@@ -324,7 +324,6 @@ public class GameController : MonoBehaviour
         newCube.transform.parent = cubesParent;
     }
 
-
     public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
     {
         // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
@@ -343,17 +342,12 @@ public class GameController : MonoBehaviour
     {
         for (int i = 0; i < M; ++i)
         {
-            if (i == 18)
-            { 
-
             Debug.Log((i + 1) + ". satır:");
 
             for (int j = 0; j < N; ++j)
                 Debug.Log(status[i, j]);
 
-            Debug.Log("####################################");
-            
-            }
+            Debug.Log("####################################");   
         }
     }
 

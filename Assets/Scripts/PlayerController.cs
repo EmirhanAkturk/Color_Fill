@@ -68,9 +68,9 @@ public class PlayerController : MonoBehaviour
             //check for hitting the tail
             if (!DidHitTail(currentMovePosition))
             {
-                CheckIndoorArea(currentMovePosition);
+                CheckIndoorArea(newMovePosition);
 
-                AddCubeToTrail(currentMovePosition);
+                AddCubeToTrail(newMovePosition);
 
                 switch (moveDirection)
                 {
@@ -121,11 +121,11 @@ public class PlayerController : MonoBehaviour
     {
         Vector2Int currentPosition = new Vector2Int((int)currentMovePosition.x, (int)currentMovePosition.z);
         Vector2Int nextPosition = GetNextPosition(currentPosition);
-        //Debug.Log(currentMovePosition + " " + currentPosition);
 
         Vector2Int matrixIndex = GameController.instance.ConvertPositionToMatrixIndex(currentPosition);
         Vector2Int nextMatrixIndex = GameController.instance.ConvertPositionToMatrixIndex(nextPosition);
 
+        Debug.Log(matrixIndex + " , " + nextMatrixIndex);
         bool isTileFilled = GameController.instance.IsTileFilled(matrixIndex);
         bool isTileWall = GameController.instance.IsTileWall(nextMatrixIndex);
 
@@ -134,11 +134,15 @@ public class PlayerController : MonoBehaviour
             AddCubeToTrail(currentMovePosition);
             UpdateTail();
             
-            if (!turningPoints.Contains(currentPosition))
-                turningPoints.Add(currentPosition);
+            if (!turningPoints.Contains(currentPosition)) {
+                //Debug.Log(turningPoints.Count);
+                AddTurningPoint();
+            }
 
             //GameController.instance.AddEndPoint(turningPoints);
             GameController.instance.FillWithCubes(turningPoints);
+            turningPoints.Clear();
+
         }
     }
 
@@ -146,9 +150,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector2Int cubePosition;
         Vector2Int matrixIndex;
-        Debug.Log("###############################");
-        GameController.instance.PrintMatrix();
-        Debug.Log("###############################");
+
         foreach (GameObject cube in tailCubes)
         {
             cubePosition = new Vector2Int((int)cube.transform.position.x, (int)cube.transform.position.z);
@@ -158,10 +160,6 @@ public class PlayerController : MonoBehaviour
             cube.transform.localScale = fillingCubeScale;
         }
 
-        Debug.Log("###############################");
-
-        GameController.instance.PrintMatrix();
-        Debug.Log("###############################");
         tailCubes.Clear();
     }
 

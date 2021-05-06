@@ -845,11 +845,11 @@ MonoBehaviour:
   - {x: 10, y: 11}
   - {x: 18, y: 11}
   turningPoints2:
-  - {x: 12, y: 5}
-  - {x: 18, y: 5}
+  - {x: 14, y: 7}
+  - {x: 18, y: 7}
   - {x: 18, y: 8}
-  - {x: 12, y: 8}
-  - {x: 12, y: 5}
+  - {x: 14, y: 8}
+  - {x: 14, y: 7}
 --- !u!114 &1167095944
 MonoBehaviour:
   m_ObjectHideFlags: 0

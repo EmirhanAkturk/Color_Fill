@@ -36,7 +36,7 @@ public class FillingCubePool : MonoBehaviour
         N = GameController.instance.GetN();
 
         //allocate memory as many as the number of max trail cube.
-        fillingCubes = new List<GameObject>((M - 1) * (N - 1));
+        fillingCubes = new List<GameObject>((M - 2) * (N - 2));
     }
 
 
