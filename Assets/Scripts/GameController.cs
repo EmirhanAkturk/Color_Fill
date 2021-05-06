@@ -40,14 +40,38 @@ public class GameController : MonoBehaviour
 
     List<GameObject> playerCubes;
     TileStatus[ , ] status;
-    
+
+    #region Getters - Setters
     public int GetM() { return M; }
     public int GetN() { return N; }
 
-    public TileStatus GetTileStatus(Vector2Int matrixIndex)
+    public bool IsTileEmpty(Vector2Int matrixIndex)
     {
-        return status[matrixIndex.x, matrixIndex.y];
+        return status[matrixIndex.x, matrixIndex.y] == TileStatus.Empty;
+    }    
+    public void SetTileEmpty(Vector2Int matrixIndex)
+    {
+        status[matrixIndex.x, matrixIndex.y] = TileStatus.Empty;
+    }    
+  
+    public bool IsTileFilled(Vector2Int matrixIndex)
+    {
+        return status[matrixIndex.x, matrixIndex.y] == TileStatus.Filled;
+    }    
+    public void SetTileFilled(Vector2Int matrixIndex)
+    {
+        status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
+    }      
+    
+    public bool IsTileWall(Vector2Int matrixIndex)
+    {
+        return status[matrixIndex.x, matrixIndex.y] == TileStatus.Wall;
+    }   
+    public void SetTileWall(Vector2Int matrixIndex)
+    {
+        status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
     }
+    #endregion
 
     private void Awake()
     {
@@ -66,13 +90,13 @@ public class GameController : MonoBehaviour
         GridEditor();
         DrawWalls();
 
-        AddEndPoint(turningPoints);
-        DrawLines(turningPoints, playerCube);
+        //AddEndPoint(turningPoints);
+        //DrawLines(turningPoints, playerCube, false);
 
-        AddEndPoint(turningPoints2);
-        DrawLines(turningPoints2, wallCube);
+        //AddEndPoint(turningPoints2);
+        DrawLines(turningPoints2, wallCube, false);
 
-        FillWithCubes();
+        //FillWithCubes();
         //PrintMatrix();
     }
 
@@ -89,7 +113,41 @@ public class GameController : MonoBehaviour
 
         AddCornerPoints(cornerPoints, cornerMatrixIndexs);
 
-        DrawLines(cornerPoints, wallCube);
+        DrawLines(cornerPoints, wallCube, false);
+    }
+
+    private void AddCornerPoints(List<Vector2Int> cornerPoints, List<Vector2Int> cornerMatrixIndexs)
+    {
+        Vector2Int point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
+        cornerPoints.Add(point);
+        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
+
+        point = ConvertMatrixIndexToPosition(new Vector2Int(0, N - 1));
+        cornerPoints.Add(point);
+        cornerMatrixIndexs.Add(new Vector2Int(0, N - 1));
+
+        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, N - 1));
+        cornerPoints.Add(point);
+        cornerMatrixIndexs.Add(new Vector2Int(M - 1, N - 1));
+
+        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, 0));
+        cornerPoints.Add(point);
+        cornerMatrixIndexs.Add(new Vector2Int(M - 1, 0));
+
+        point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
+        cornerPoints.Add(point); // for the last wall
+        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
+    }
+
+    private void DrawLines(List<Vector2Int>points, GameObject cube, bool isWall)
+    {
+        if(!isWall)
+            AddEndPoint(points);
+
+        for (int i = 0; i < (points.Count - 1); ++i)
+        {
+            DrawLine(points[i], points[i + 1], cube);
+        }
     }
 
     private void AddEndPoint(List<Vector2Int> turningPoints)
@@ -118,37 +176,6 @@ public class GameController : MonoBehaviour
             }
 
             turningPoints[lenght - 1] = lastPoint;
-        }
-    }
-
-    private void AddCornerPoints(List<Vector2Int> cornerPoints, List<Vector2Int> cornerMatrixIndexs)
-    {
-        Vector2Int point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
-        cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
-
-        point = ConvertMatrixIndexToPosition(new Vector2Int(0, N - 1));
-        cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(0, N - 1));
-
-        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, N - 1));
-        cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(M - 1, N - 1));
-
-        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, 0));
-        cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(M - 1, 0));
-
-        point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
-        cornerPoints.Add(point); // for the last wall
-        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
-    }
-
-    private void DrawLines(List<Vector2Int>points, GameObject cube)
-    {
-        for (int i = 0; i < (points.Count - 1); ++i)
-        {
-            DrawLine(points[i], points[i + 1], cube);
         }
     }
 
@@ -268,10 +295,10 @@ public class GameController : MonoBehaviour
         {
             matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
 
-            if (matrixIndex.x < M - 1)
+            if (matrixIndex.x < M - 2)
                 ++matrixIndex.x;
 
-            if (matrixIndex.y < N - 1)
+            if (matrixIndex.y < N - 2)
                 ++matrixIndex.y;
 
             BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
@@ -280,6 +307,9 @@ public class GameController : MonoBehaviour
 
     private void BoundaryFill(int m, int n, TileStatus fill_color, TileStatus boundary_color)
     {
+        if (m >= M || m < 0 || n >= N || n < 0)
+            return;
+
         if (status[m, n] != TileStatus.Wall &&
             status[m, n] != fill_color)
         {

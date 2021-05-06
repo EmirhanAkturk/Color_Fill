@@ -14,24 +14,30 @@ public class PlayerController : MonoBehaviour
         MoveRight = 4,
     }
 
+    [Header("Cubes")]
+    [SerializeField]
+    Transform cubesParent;
 
     [SerializeField]
-    float distance;
+    GameObject trailCube;
 
     [SerializeField]
-    float moveTime;
+    float moveTime = 4;
 
-    int M, N;
-
+    private float distance = 20;
     private MoveDirection moveDirection;
-    private Vector2 startTouchPosition, currentTouchPosition, endPosition;
+
+    private Vector2 startTouchPosition, currentTouchPosition;
     private Vector3 newMovePosition;
+    
+    private List<Vector2Int> turningPoints;
+    private List<GameObject> trailCubes;
 
 
     private void Start()
     {
-        M = GameController.instance.GetM();
-        N = GameController.instance.GetN();
+        turningPoints = new List<Vector2Int>();
+        trailCubes = new List<GameObject>();
 
         newMovePosition = gameObject.transform.position;
     }
@@ -46,7 +52,10 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 currentMovePosition = gameObject.transform.position;
 
-        if (newMovePosition == currentMovePosition) { 
+        if (newMovePosition == currentMovePosition)
+        {
+            AddCubeToTrail(currentMovePosition);
+
             switch (moveDirection)
             {
                 case MoveDirection.MoveUp:
@@ -69,24 +78,39 @@ public class PlayerController : MonoBehaviour
                     newMovePosition = currentMovePosition;
                     break;
             }
+
         }
         else {
 
             Vector2Int position = new Vector2Int((int)newMovePosition.x, (int)newMovePosition.z);
             Vector2Int matrixIndex = GameController.instance.ConvertPositionToMatrixIndex(position);
 
-            GameController.TileStatus tileStatus = GameController.instance.GetTileStatus(matrixIndex);
-            bool isCanMove = (tileStatus != GameController.TileStatus.Wall);
+            bool isCanMove = !GameController.instance.IsTileWall(matrixIndex);
 
-            bool isPositionChanged = (newMovePosition != currentMovePosition);
-
-            if (isCanMove)
+            if (isCanMove) 
+            {
                 gameObject.transform.position = Vector3.MoveTowards(currentMovePosition, newMovePosition, moveTime * Time.deltaTime);
+            }
             else
             {
                 newMovePosition = currentMovePosition;
                 moveDirection = MoveDirection.None;
             }
+        }
+    }
+
+    private void AddCubeToTrail(Vector3 cubePosition)
+    {
+        Vector2Int position = new Vector2Int((int)cubePosition.x, (int)cubePosition.z);
+        Vector2Int matrixIndex = GameController.instance.ConvertPositionToMatrixIndex(position);
+
+        if (GameController.instance.IsTileEmpty(matrixIndex)) 
+        {
+            GameObject newCube = Instantiate(trailCube, cubePosition, Quaternion.identity);
+            trailCubes.Add(newCube);
+            newCube.transform.parent = cubesParent;
+            
+            GameController.instance.SetTileFilled(matrixIndex);
         }
     }
 
