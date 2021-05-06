@@ -31,13 +31,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Vector3 fillingCubeScale; 
 
-    //[Header("Colors")]
-    //[SerializeField]
-    //Color darkBlue;
-
-    //[SerializeField]
-    //Color lightBlue;
-
     private float swipeLimitDistance = 20;
     private MoveDirection moveDirection = MoveDirection.None;
 
@@ -98,7 +91,8 @@ public class PlayerController : MonoBehaviour
             else
                 moveDirection = MoveDirection.None;
         }
-        else {
+        else 
+        {
 
             Vector2Int position = new Vector2Int((int)newMovePosition.x, (int)newMovePosition.z);
             Vector2Int matrixIndex = GameController.instance.ConvertPositionToMatrixIndex(position);
@@ -125,7 +119,6 @@ public class PlayerController : MonoBehaviour
         Vector2Int matrixIndex = GameController.instance.ConvertPositionToMatrixIndex(currentPosition);
         Vector2Int nextMatrixIndex = GameController.instance.ConvertPositionToMatrixIndex(nextPosition);
 
-        Debug.Log(matrixIndex + " , " + nextMatrixIndex);
         bool isTileFilled = GameController.instance.IsTileFilled(matrixIndex);
         bool isTileWall = GameController.instance.IsTileWall(nextMatrixIndex);
 
@@ -135,14 +128,17 @@ public class PlayerController : MonoBehaviour
             UpdateTail();
             
             if (!turningPoints.Contains(currentPosition)) {
-                //Debug.Log(turningPoints.Count);
                 AddTurningPoint();
             }
 
             //GameController.instance.AddEndPoint(turningPoints);
             GameController.instance.FillWithCubes(turningPoints);
-            turningPoints.Clear();
+            print("###################");
+            foreach (var point in turningPoints)
+                print(GameController.instance.ConvertPositionToMatrixIndex(point));
+            print("###################");
 
+            turningPoints.Clear();
         }
     }
 

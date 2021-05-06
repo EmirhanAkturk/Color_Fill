@@ -241,10 +241,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
-      propertyPath: moveTime
-      value: 7.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 425010546, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
       propertyPath: cubesParent
       value: 
       objectReference: {fileID: 143533947}
@@ -307,6 +303,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 6169623734096852669, guid: 0d8e3b8f60f2b124dad90779c766b659,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d8e3b8f60f2b124dad90779c766b659, type: 3}
@@ -832,24 +833,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 344df25383b5dfd4fa475846f0d8e4d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planeMeshRender: {fileID: 2128002694}
   M: 20
   N: 20
-  planeMeshRender: {fileID: 2128002694}
   fillingCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
     type: 3}
   wallCube: {fileID: 6169623734096852669, guid: 66dbbd440c3f50f4dbd588ee452b526a,
     type: 3}
   cubesParent: {fileID: 143533947}
-  turningPoints:
-  - {x: 10, y: 1}
-  - {x: 10, y: 11}
-  - {x: 18, y: 11}
-  turningPoints2:
-  - {x: 14, y: 7}
-  - {x: 18, y: 7}
-  - {x: 18, y: 8}
-  - {x: 14, y: 8}
-  - {x: 14, y: 7}
+  wallPoints:
+  - {x: 18, y: 10}
+  - {x: 15, y: 9}
+  fillPoints: []
 --- !u!114 &1167095944
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,7 +14,9 @@ public class GameController : MonoBehaviour
     public static GameController instance;
 
     [Header("Plane values")]
-
+    [SerializeField]
+    MeshRenderer planeMeshRender;
+    
     //x = 0, y = 0 bottom left
     //For matrix A of MxN dimensions
     // A[m][n]
@@ -23,9 +25,6 @@ public class GameController : MonoBehaviour
     [Tooltip("Number of rows and columns of the matrix")]
     [SerializeField] 
     int M, N;
-
-    [SerializeField]
-    MeshRenderer planeMeshRender;
 
     [Header("Cubes")]
     [SerializeField] 
@@ -36,11 +35,11 @@ public class GameController : MonoBehaviour
 
     [SerializeField] 
     Transform cubesParent;
-    
-    [SerializeField] 
-    List<Vector2Int> turningPoints, turningPoints2;
 
-    //List<GameObject> playerCubes;
+    [Header("Wall Points")]
+    [SerializeField]            //todo delete fillPoints
+    List<Vector2Int> wallPoints, fillPoints;
+
     TileStatus[ , ] status;
     bool isGameFinished; // todo it can be with Unity event
 
@@ -102,13 +101,15 @@ public class GameController : MonoBehaviour
         status = new TileStatus[M, N];
 
         GridEditor();
-        DrawWalls();
+        DrawWalls(Vector2Int.zero, new Vector2Int(M-1, N-1));
+
+        DrawWalls(wallPoints[0], wallPoints[1]);
 
         //AddEndPoint(turningPoints);
         //DrawLines(turningPoints, fillingCube, false);
 
         //AddEndPoint(turningPoints2);
-        DrawLines(turningPoints2, wallCube, false);
+        //DrawLines(turningPoints2, wallCube, false);
 
         //FillWithCubes(turningPoints);
         //PrintMatrix();
@@ -120,44 +121,43 @@ public class GameController : MonoBehaviour
         planeGridMaterial.mainTextureScale = new Vector2(M, N);
     }
 
-    private void DrawWalls()
+    private void DrawWalls(Vector2Int corner1, Vector2Int corner2)
+    {
+        List<Vector2Int> cornerPoints;
+
+        cornerPoints = GetCornerPoints(corner1, corner2);
+
+        DrawLines(cornerPoints, wallCube);
+    }
+
+    private List<Vector2Int> GetCornerPoints(Vector2Int corner1, Vector2Int corner2)
     {
         List<Vector2Int> cornerPoints = new List<Vector2Int>();
-        List<Vector2Int> cornerMatrixIndexs = new List<Vector2Int>();
 
-        AddCornerPoints(cornerPoints, cornerMatrixIndexs);
+        Vector2Int point = corner1;
 
-        DrawLines(cornerPoints, wallCube, false);
-    }
-
-    private void AddCornerPoints(List<Vector2Int> cornerPoints, List<Vector2Int> cornerMatrixIndexs)
-    {
-        Vector2Int point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
         cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
 
-        point = ConvertMatrixIndexToPosition(new Vector2Int(0, N - 1));
+        point = new Vector2Int(corner1.x, corner2.y);
         cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(0, N - 1));
 
-        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, N - 1));
+        point = corner2;
+
         cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(M - 1, N - 1));
 
-        point = ConvertMatrixIndexToPosition(new Vector2Int(M - 1, 0));
+        point = new Vector2Int(corner2.x, corner1.y);
+
         cornerPoints.Add(point);
-        cornerMatrixIndexs.Add(new Vector2Int(M - 1, 0));
 
-        point = ConvertMatrixIndexToPosition(new Vector2Int(0, 0));
+        point = corner1;
+
         cornerPoints.Add(point); // for the last wall
-        cornerMatrixIndexs.Add(new Vector2Int(0, 0));
+
+        return cornerPoints;
     }
 
-    private void DrawLines(List<Vector2Int>points, GameObject cube, bool isWall)
+    private void DrawLines(List<Vector2Int>points, GameObject cube)
     {
-        if (!isWall)
-            AddEndPoint(points);
-
         for (int i = 0; i < (points.Count - 1); ++i)
         {
             DrawLine(points[i], points[i + 1], cube);
@@ -224,7 +224,6 @@ public class GameController : MonoBehaviour
                 Vector2Int matrixIndex = ConvertPositionToMatrixIndex(point);
 
                 CreateCube(cube, ref point, ref newCube, matrixIndex);
-
             }
         }
         else if(p1.y == p2.y)
@@ -274,7 +273,6 @@ public class GameController : MonoBehaviour
         }
         
         newCube.transform.parent = cubesParent;
-
     }
 
     public void FillWithCubes(List<Vector2Int> turningPoints)
