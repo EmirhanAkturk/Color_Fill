@@ -38,7 +38,7 @@ public class GameController : MonoBehaviour
     [SerializeField] 
     List<Vector2Int> turningPoints, turningPoints2;
 
-    List<GameObject> playerCubes;
+    //List<GameObject> playerCubes;
     TileStatus[ , ] status;
 
     #region Getters - Setters
@@ -84,7 +84,6 @@ public class GameController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        playerCubes = new List<GameObject>();
         status = new TileStatus[M, N];
 
         GridEditor();
@@ -182,7 +181,7 @@ public class GameController : MonoBehaviour
     private void DrawLine(Vector2Int p1, Vector2Int p2, GameObject cube)
     {
         Vector2Int point = Vector2Int.zero;
-        GameObject newCube;
+        GameObject newCube = null;
 
         if ( p1.x == p2.x)
         {
@@ -204,9 +203,6 @@ public class GameController : MonoBehaviour
 
             for (int i = lowerBound ; i <= upperBound; ++i) 
             {
-                newCube = Instantiate(cube, new Vector3(p1.x, 0, i), Quaternion.identity);
-                newCube.transform.parent = cubesParent;
-
                 point.x = p1.x;
                 point.y = i;
 
@@ -214,11 +210,17 @@ public class GameController : MonoBehaviour
 
                 if (cube.tag == "PlayerCube") 
                 {
-                    playerCubes.Add(newCube);
+                    newCube = TrailCubePool.instance.GetTrailCube();
+                    newCube.transform.position = new Vector3(p1.x, 0, i);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
                 }
                 else if (cube.tag == "WallCube")
+                {
+                    newCube = Instantiate(cube, new Vector3(p1.x, 0, i), Quaternion.identity);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
+                }
+
+                newCube.transform.parent = cubesParent;
             }
         }
         else if(p1.y == p2.y)
@@ -241,8 +243,6 @@ public class GameController : MonoBehaviour
 
             for (int i = lowerBound; i <= upperBound; ++i) 
             {
-                newCube = Instantiate(cube, new Vector3(i, 0, p1.y), Quaternion.identity);
-                newCube.transform.parent = cubesParent;
 
                 point.x = i;
                 point.y = p1.y;
@@ -251,11 +251,17 @@ public class GameController : MonoBehaviour
 
                 if (cube.tag == "PlayerCube")
                 {
-                    playerCubes.Add(newCube);
+                    newCube = TrailCubePool.instance.GetTrailCube();
+                    newCube.transform.position = new Vector3(i, 0, p1.y);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
                 }
                 else if (cube.tag == "WallCube")
+                {
+                    newCube = Instantiate(cube, new Vector3(i, 0, p1.y), Quaternion.identity);
                     status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
+                }
+                
+                newCube.transform.parent = cubesParent;
             }
         }
     }
@@ -326,7 +332,9 @@ public class GameController : MonoBehaviour
     {
         status[m, n] = fill_color;
         Vector2Int position = ConvertMatrixIndexToPosition(new Vector2Int(m, n));
-        GameObject newCube = Instantiate(playerCube, new Vector3(position.x, 0, position.y), Quaternion.identity);
+        GameObject newCube = TrailCubePool.instance.GetTrailCube();
+
+        newCube.transform.position = new Vector3(position.x, 0, position.y);
         newCube.transform.parent = cubesParent;
     }
 }

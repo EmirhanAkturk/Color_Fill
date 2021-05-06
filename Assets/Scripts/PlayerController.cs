@@ -106,7 +106,9 @@ public class PlayerController : MonoBehaviour
 
         if (GameController.instance.IsTileEmpty(matrixIndex)) 
         {
-            GameObject newCube = Instantiate(trailCube, cubePosition, Quaternion.identity);
+            GameObject newCube = TrailCubePool.instance.GetTrailCube();
+            newCube.transform.position = cubePosition;
+           
             trailCubes.Add(newCube);
             newCube.transform.parent = cubesParent;
             

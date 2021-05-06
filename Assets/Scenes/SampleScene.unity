@@ -155,7 +155,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &313081394
 PrefabInstance:
@@ -797,6 +797,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1167095942}
   - component: {fileID: 1167095943}
+  - component: {fileID: 1167095944}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -848,6 +849,21 @@ MonoBehaviour:
   - {x: 18, y: 8}
   - {x: 12, y: 8}
   - {x: 12, y: 5}
+--- !u!114 &1167095944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1167095941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00c849bbcceadd44c8e53948da953869, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trailCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
+    type: 3}
+  cubesParent: {fileID: 2078270710}
 --- !u!4 &1263962923 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6169623734096852665, guid: 66dbbd440c3f50f4dbd588ee452b526a,
@@ -1088,6 +1104,36 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 918614438}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2078270709
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2078270710}
+  m_Layer: 0
+  m_Name: Trail Cube Pool Parent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2078270710
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078270709}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2128002691
 GameObject:
   m_ObjectHideFlags: 0
