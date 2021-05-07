@@ -39,7 +39,6 @@ public class FillingCubePool : MonoBehaviour
         fillingCubes = new List<GameObject>((M - 2) * (N - 2));
     }
 
-
     private void FillList()
     {
         int length = fillingCubes.Capacity;

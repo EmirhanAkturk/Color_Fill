@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 startTouchPosition, currentTouchPosition;
     private Vector3 newMovePosition;
 
-    private WaitForSeconds fillDelay;
+    //private WaitForSeconds fillDelay;
 
     private List<Vector2Int> turningPoints;
     private List<GameObject> tailCubes;
@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviour
         M = LevelController.instance.GetM();
         N = LevelController.instance.GetN();
 
-        fillDelay = new WaitForSeconds(0.1f);
+        //fillDelay = new WaitForSeconds(0.1f);
 
         turningPoints = new List<Vector2Int>();
         tailCubes = new List<GameObject>();
@@ -63,6 +63,12 @@ public class PlayerController : MonoBehaviour
             TouchControl();
             MovePlayer();
         }
+    }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        //if (other.gameObject.CompareTag("TailCube"))
+            //GameManager.instance.LevelFail();
     }
 
     private void MovePlayer()
@@ -167,6 +173,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (GameObject cube in tailCubes)
         {
+            cube.tag = "FillingCube";
             cubePosition = new Vector2Int((int)cube.transform.position.x, (int)cube.transform.position.z);
             matrixIndex = ConvertPositionToMatrixIndex(cubePosition);
             LevelController.instance.SetTileFilled(matrixIndex);
@@ -211,6 +218,7 @@ public class PlayerController : MonoBehaviour
             GameObject newCube = FillingCubePool.instance.GetFillingCube();
             newCube.transform.position = cubePosition;
             newCube.transform.localScale = tailCubeScale;
+            newCube.tag = "TailCube";
 
             tailCubes.Add(newCube);
             newCube.transform.parent = cubesParent;

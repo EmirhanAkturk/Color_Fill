@@ -25,8 +25,8 @@ public class ViewManager : MonoBehaviour
 
     private void Start()
     {
-        losePanel.SetActive(false);
-        winPanel.SetActive(false);
+        losePanel?.SetActive(false);
+        winPanel?.SetActive(false);
     }
 
     private void OnWinLoseListener(bool isWin)
@@ -39,21 +39,26 @@ public class ViewManager : MonoBehaviour
 
     private void Lose()
     {
-        losePanel.SetActive(true);
+        losePanel?.SetActive(true);
     }
 
     private void Win()
     {
-        winPanel.SetActive(true);
+        winPanel?.SetActive(true);
     }
 
     public void NextLevel()
     {
+        int prevLevel = PlayerPrefs.GetInt("CurrentLevelNumber");
+        PlayerPrefs.SetInt("CurrentLevelNumber", ++prevLevel);
 
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentIndex + 1);
     }
 
     public void RetryLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentIndex);
     }
 }
