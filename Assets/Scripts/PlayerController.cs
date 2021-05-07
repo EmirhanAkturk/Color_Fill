@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Vector3 fillingCubeScale;
 
+    //For matrix A of MxN dimensions
     int M, N;
 
     private float swipeLimitDistance = 20;

@@ -42,7 +42,8 @@ public class LevelController : MonoBehaviour
     List<Vector2Int> wallPoints, fillPoints;
 
     TileStatus[ , ] status;
-    
+    int emptyTileCount;
+
     #region Getters - Setters
 
     public int GetM() { return M; }
@@ -55,8 +56,9 @@ public class LevelController : MonoBehaviour
     public void SetTileEmpty(Vector2Int matrixIndex)
     {
         status[matrixIndex.x, matrixIndex.y] = TileStatus.Empty;
-    }    
-  
+        IncreaseEmptyTileCount();
+    }
+
     public bool IsTileBeingFilled(Vector2Int matrixIndex)
     {
         return status[matrixIndex.x, matrixIndex.y] == TileStatus.BeingFilled;
@@ -64,8 +66,8 @@ public class LevelController : MonoBehaviour
     public void SetTileBeingFilled(Vector2Int matrixIndex)
     {
         status[matrixIndex.x, matrixIndex.y] = TileStatus.BeingFilled;
-    }      
-    
+    }
+
     public bool IsTileFilled(Vector2Int matrixIndex)
     {
         return status[matrixIndex.x, matrixIndex.y] == TileStatus.Filled;
@@ -73,8 +75,9 @@ public class LevelController : MonoBehaviour
     public void SetTileFilled(Vector2Int matrixIndex)
     {
         status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
-    }      
-    
+        DecreaseEmptyTileCount();
+    }
+
     public bool IsTileWall(Vector2Int matrixIndex)
     {
         return status[matrixIndex.x, matrixIndex.y] == TileStatus.Wall;
@@ -82,8 +85,10 @@ public class LevelController : MonoBehaviour
     public void SetTileWall(Vector2Int matrixIndex)
     {
         status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
+        DecreaseEmptyTileCount();
     }
     #endregion
+
 
     private void Awake()
     {
@@ -96,6 +101,8 @@ public class LevelController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        emptyTileCount = M * N;
+
         status = new TileStatus[M, N];
 
         GridEditor();
@@ -232,15 +239,28 @@ public class LevelController : MonoBehaviour
             newCube = Instantiate(fillingCube, new Vector3(point.x, 0, point.y), Quaternion.identity);
             //newCube = FillingCubePool.instance.GetFillingCube();
             //newCube.transform.position = new Vector3(point.x, 0, point.y);
-            status[matrixIndex.x, matrixIndex.y] = TileStatus.Filled;
+            SetTileFilled(matrixIndex);
         }
         else if (cube.tag == "WallCube")
         {
             newCube = Instantiate(cube, new Vector3(point.x, 0, point.y), Quaternion.identity);
-            status[matrixIndex.x, matrixIndex.y] = TileStatus.Wall;
+            SetTileWall(matrixIndex);
         }
         
         newCube.transform.parent = cubesParent;
+    }
+
+    private void IncreaseEmptyTileCount()
+    {
+        ++emptyTileCount;
+    }
+
+    private void DecreaseEmptyTileCount()
+    {
+        --emptyTileCount;
+
+        if (emptyTileCount == 0)
+            GameManager.instance.LevelComplate();
     }
 
     public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
