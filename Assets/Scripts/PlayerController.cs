@@ -23,7 +23,6 @@ public class PlayerController : MonoBehaviour
         FillRight = 4,
     }
 
-
     [Header("Player Movement")]
     [SerializeField]
     float moveTime = 4;
@@ -250,28 +249,12 @@ public class PlayerController : MonoBehaviour
 
         if (isNextTileWall || isNextTileFilled)
         {
-            //if(tailCubes.Count > 1) //todo delete this
-            //    Debug.Log("Before Last item in tailCubes: " + tailCubes[tailCubes.Count - 1].transform.position +"," + tailCubes.Count);
-
             AddCubeToTrail(movePosition);
-
-            //if (tailCubes.Count > 1) //todo delete this
-            //    Debug.Log("After Last item in tailCubes: " + tailCubes[tailCubes.Count - 1].transform.position + "," + tailCubes.Count);
 
             UpdateTailStatus();
 
             if (!turningPoints.Contains(currentPosition))
                 AddTurningPoint();
-
-            //if (turningPoints.Count > 1) // todo delete this
-            //{
-            //    print("###################");
-            //    foreach (var point in turningPoints)
-            //        print(point);
-            //    print("###################");
-            //}
-
-            //GameController.instance.AddEndPoint(turningPoints);
 
             FillWithCubes(turningPoints);
 
@@ -298,7 +281,6 @@ public class PlayerController : MonoBehaviour
             newCube.transform.parent = cubesParent;
 
             LevelController.instance.SetTileBeingFilled(matrixIndex);
-
         }
     }
 
@@ -322,21 +304,21 @@ public class PlayerController : MonoBehaviour
 
     public void FillWithCubes(List<Vector2Int> turningPoints)
     {
-        Vector2Int matrixIndex; // cube matrix index
-        Vector2Int position; // cube matrix index
+        Vector2Int matrixIndex1, matrixIndex2; // cube matrix index
+        Vector2Int midPoint; // cube matrix index
 
         Vector2Int point1, point2;
 
         // filling distances  distances
-        int upDistance = 0, downDistance = 0, leftDistance = 0, rightDistance = 0;
+        int upDistance, downDistance , leftDistance , rightDistance ;
         int fillingDistance, distance1, distance2;
 
-        if(turningPoints.Count > 1)
-            Debug.Log(turningPoints.Count);
+        FillDirection verticleFillDirection = FillDirection.FillDown;
+        FillDirection horizontalFillDirection = FillDirection.FillRight;
 
-        if (turningPoints.Count % 2 == 0)
+        if (turningPoints.Count == 2 /*% 2 == 0*/)
         {
-            if(turningPoints.Count == 2) 
+            if (turningPoints.Count == 2) 
             { 
                 point1 = turningPoints[0];
                 point2 = turningPoints[1];
@@ -347,37 +329,9 @@ public class PlayerController : MonoBehaviour
                 point2 = turningPoints[turningPoints.Count - 2]; // second to last point
             }
 
-            position = (point1 + point2) / 2;
-
-            #region temp
-
-            //todo delete lines in comment below
-            Debug.Log(position);
-
-            distance1 = GetFillDistance(point1, FillDirection.FillUp);
-            distance2 = GetFillDistance(point2, FillDirection.FillUp);
-            upDistance = distance1 < distance2 ? distance1 : distance2;
-
-            distance1 = GetFillDistance(point1, FillDirection.FillDown);
-            distance2 = GetFillDistance(point2, FillDirection.FillDown);
-            downDistance = distance1 < distance2 ? distance1 : distance2;
-
-            distance1 = GetFillDistance(point1, FillDirection.FillRight);
-            distance2 = GetFillDistance(point2, FillDirection.FillRight);
-            rightDistance = distance1 < distance2 ? distance1 : distance2;
-
-            distance1 = GetFillDistance(point1, FillDirection.FillLeft);
-            distance2 = GetFillDistance(point2, FillDirection.FillLeft);
-            leftDistance = distance1 < distance2 ? distance1 : distance2;
-
-            Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
-
-            #endregion
-
             if (point1.y == point2.y) // horizontal line
             {
                 //Debug.Log($"Point1:{point1}, Point2: {point2}");
-
                 distance1 = GetFillDistance(point1, FillDirection.FillUp);
                 distance2 = GetFillDistance(point2, FillDirection.FillUp);
                 upDistance = distance1 > distance2 ? distance1 : distance2;
@@ -386,117 +340,157 @@ public class PlayerController : MonoBehaviour
                 distance2 = GetFillDistance(point2, FillDirection.FillDown);
                 downDistance = distance1 > distance2 ? distance1 : distance2;
 
-                if ( upDistance > downDistance)
+                if (downDistance <= upDistance) 
                 {
-                    --position.y;
+                    verticleFillDirection = FillDirection.FillDown;
                     fillingDistance = downDistance;
                 }
-
                 else
                 {
-                    ++position.y;
+                    verticleFillDirection = FillDirection.FillUp;
                     fillingDistance = upDistance;
                 }
 
-                point1.y = position.y;
-                point2.y = position.y;
+                int innerSpace = fillingDistance * Mathf.Abs(point1.x - point2.x);
+                int outerSpace = LevelController.instance.GetEmptyTileCount() - innerSpace;
+
+                // reverse  fill direction
+                if (innerSpace > outerSpace)
+                {
+                    if (verticleFillDirection == FillDirection.FillUp)
+                        verticleFillDirection = FillDirection.FillDown;
+                    else
+                        verticleFillDirection = FillDirection.FillUp;
+                }
+
+                if(point1.x > point2.x)
+                {
+                    //make fill directions towards each other for easier filling
+                    matrixIndex1 = GetFillMatrixIndex(point1, verticleFillDirection, FillDirection.FillLeft);
+                    matrixIndex2 = GetFillMatrixIndex(point2, verticleFillDirection, FillDirection.FillRight);
+                }
+                else
+                {
+                    //make fill directions towards each other for easier filling
+                    matrixIndex1 = GetFillMatrixIndex(point1, verticleFillDirection, FillDirection.FillRight);
+                    matrixIndex2 = GetFillMatrixIndex(point2, verticleFillDirection, FillDirection.FillLeft);
+                }
             }
             else // verticle line
             {
-                distance1 = GetFillDistance(point1, FillDirection.FillRight);
-                distance2 = GetFillDistance(point2, FillDirection.FillRight);
-                rightDistance = distance1 > distance2 ? distance1 : distance2;
-
+                //Debug.Log($"Point1:{point1}, Point2: {point2}");
                 distance1 = GetFillDistance(point1, FillDirection.FillLeft);
                 distance2 = GetFillDistance(point2, FillDirection.FillLeft);
                 leftDistance = distance1 > distance2 ? distance1 : distance2;
 
-                if (rightDistance > leftDistance)
+                distance1 = GetFillDistance(point1, FillDirection.FillRight);
+                distance2 = GetFillDistance(point2, FillDirection.FillRight);
+                rightDistance = distance1 > distance2 ? distance1 : distance2;
+
+                if (leftDistance <= rightDistance)
                 {
-                    --position.x;
+                    horizontalFillDirection = FillDirection.FillLeft;
                     fillingDistance = leftDistance;
                 }
-
                 else
                 {
-                    ++position.x;
+                    horizontalFillDirection = FillDirection.FillRight;
                     fillingDistance = rightDistance;
                 }
 
-                point1.x = position.x;
-                point2.x = position.x;
+                int innerSpace = fillingDistance * Mathf.Abs(point1.y - point2.y);
+                int outerSpace = LevelController.instance.GetEmptyTileCount() - innerSpace;
 
+                // reverse  fill direction
+                if (innerSpace > outerSpace)
+                {
+                    if (horizontalFillDirection == FillDirection.FillLeft)
+                        horizontalFillDirection = FillDirection.FillRight;
+                    else
+                        horizontalFillDirection = FillDirection.FillLeft;
+                }
+
+                if (point1.y > point2.y)
+                {
+                    //make fill directions towards each other for easier filling
+                    matrixIndex1 = GetFillMatrixIndex(point1, FillDirection.FillDown, horizontalFillDirection);
+                    matrixIndex2 = GetFillMatrixIndex(point2, FillDirection.FillUp, horizontalFillDirection);
+                }
+                else
+                {
+                    //make fill directions towards each other for easier filling
+                    matrixIndex1 = GetFillMatrixIndex(point1, FillDirection.FillUp, horizontalFillDirection);
+                    matrixIndex2 = GetFillMatrixIndex(point2, FillDirection.FillDown, horizontalFillDirection);
+                }
             }
 
-            Vector2Int matrixIndex1 = ConvertPositionToMatrixIndex(point1);
-            Vector2Int matrixIndex2 = ConvertPositionToMatrixIndex(point2);
-
-            //Debug.Log($"up:{maxUpDistance}, down:{maxDownDistance}, right: {maxRightDistance}, left: {maxLeftDistance}");
-
-            if (fillingDistance > 0) { 
-                BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
-                BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
-            }
+            BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
+            BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
         }
 
-        else if (turningPoints.Count > 1)
+        else if (turningPoints.Count > 1) // situations with an odd number of turning points.
         {
-            position = turningPoints[turningPoints.Count / 2];
-
-            FillDirection verticle;
-            FillDirection horizontal;
+            midPoint = turningPoints[turningPoints.Count / 2];
 
             int verticleLength, horizontalLength;
 
-            upDistance = GetFillDistance(position, FillDirection.FillUp);
-            downDistance = GetFillDistance(position, FillDirection.FillDown);
-            leftDistance = GetFillDistance(position, FillDirection.FillLeft);
-            rightDistance = GetFillDistance(position, FillDirection.FillRight);
+            upDistance = GetFillDistance(midPoint, FillDirection.FillUp);
+            downDistance = GetFillDistance(midPoint, FillDirection.FillDown);
+            leftDistance = GetFillDistance(midPoint, FillDirection.FillLeft);
+            rightDistance = GetFillDistance(midPoint, FillDirection.FillRight);
 
-            if(downDistance == 0) 
+            verticleLength = Mathf.Abs(midPoint.y - turningPoints[0].y);
+            horizontalLength = Mathf.Abs(midPoint.x - turningPoints[0].x);
+
+            if (downDistance == 0) 
             { 
-                verticle = FillDirection.FillDown;
-                verticleLength = M - 2 - upDistance;
+                verticleFillDirection = FillDirection.FillDown;
+                if ((M - 2 - upDistance) < verticleLength)
+                    verticleLength = M - 2 - upDistance;
             }
             else
             {
-                verticle = FillDirection.FillUp;
-                verticleLength = M - 2 - downDistance;
+                verticleFillDirection = FillDirection.FillUp;
+                if ((M - 2 - downDistance) < verticleLength)
+                    verticleLength = M - 2 - upDistance;
             }
             
             if(rightDistance == 0) 
             { 
-                horizontal = FillDirection.FillRight;
-                horizontalLength = N - 2 - leftDistance;
+                horizontalFillDirection = FillDirection.FillRight;
+                if ((N - 2 - leftDistance) < horizontalLength)
+                    horizontalLength = (N - 2 - leftDistance);
             }
             else
             {
-                horizontal = FillDirection.FillLeft;
-                horizontalLength = N - 2 - rightDistance;
+                horizontalFillDirection = FillDirection.FillLeft;
+                if ((N - 2 - rightDistance) < horizontalLength)
+                    horizontalLength = (N - 2 - rightDistance);
             }
 
             int innerSpace = horizontalLength * verticleLength;
             int outerSpace = LevelController.instance.GetEmptyTileCount() - innerSpace;
 
             Debug.Log("Inner space: " + innerSpace + ", outerSpace: " + outerSpace);
-            //change fill direction
+
+            //reverse  fill direction
             if (innerSpace > outerSpace)
             {
-                if (horizontal == FillDirection.FillLeft)
-                    horizontal = FillDirection.FillRight;
+                if (horizontalFillDirection == FillDirection.FillLeft)
+                    horizontalFillDirection = FillDirection.FillRight;
                 else
-                    horizontal = FillDirection.FillLeft;
+                    horizontalFillDirection = FillDirection.FillLeft;
 
-                if (verticle == FillDirection.FillUp)
-                    verticle = FillDirection.FillDown;
+                if (verticleFillDirection == FillDirection.FillUp)
+                    verticleFillDirection = FillDirection.FillDown;
                 else
-                    verticle = FillDirection.FillUp;
+                    verticleFillDirection = FillDirection.FillUp;
             }
 
-            matrixIndex = GetFillMatrixIndex(position, verticle, horizontal);
+            matrixIndex1 = GetFillMatrixIndex(midPoint, verticleFillDirection, horizontalFillDirection);
             Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
 
-            BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
+            BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
         }
     }
 
@@ -526,7 +520,6 @@ public class PlayerController : MonoBehaviour
             
             else if(matrixIndex.y == N - 2 && matrixHorizontalChange == 1)
                 matrixHorizontalChange = 0;
- 
 
             matrixIndex.x += matrixVerticleChange;
             matrixIndex.y += matrixHorizontalChange;
