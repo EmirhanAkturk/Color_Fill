@@ -8,6 +8,7 @@ TagManager:
   - WallCube
   - EnemyCube
   - FillingCube
+  - TrailCube
   layers:
   - Default
   - TransparentFX

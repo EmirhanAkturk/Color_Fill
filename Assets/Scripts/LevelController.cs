@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class LevelController : MonoBehaviour
 {
     public enum TileStatus{
         Empty = 0,
@@ -11,7 +12,7 @@ public class GameController : MonoBehaviour
         Filled = 3,
     }
 
-    public static GameController instance;
+    public static LevelController instance;
 
     [Header("Plane values")]
     [SerializeField]
@@ -41,11 +42,8 @@ public class GameController : MonoBehaviour
     List<Vector2Int> wallPoints, fillPoints;
 
     TileStatus[ , ] status;
-    bool isGameFinished; // todo it can be with Unity event
-
+    
     #region Getters - Setters
-
-    public bool IsGameFinished { get => isGameFinished; set => isGameFinished = value; }
 
     public int GetM() { return M; }
     public int GetN() { return N; }
@@ -164,35 +162,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void AddEndPoint(List<Vector2Int> turningPoints)
-    {
-        int lenght = turningPoints.Count;
-
-        //the list must have at least two items
-        if (lenght >= 2)
-        {
-            Vector2Int otherPoint = turningPoints[lenght - 2];
-            Vector2Int lastPoint = turningPoints[lenght - 1];
-
-            if (lastPoint.x == otherPoint.x) //vertical line
-            {
-                if (lastPoint.y > otherPoint.y)
-                    ++lastPoint.y;
-                else
-                    --lastPoint.y;
-            }
-            else if (lastPoint.y == otherPoint.y) //vertical line
-            {
-                if (lastPoint.x > otherPoint.x)
-                    ++lastPoint.x;
-                else
-                    --lastPoint.x;
-            }
-
-            turningPoints[lenght - 1] = lastPoint;
-        }
-    }
-
     private void DrawLine(Vector2Int p1, Vector2Int p2, GameObject cube)
     {
         Vector2Int point = Vector2Int.zero;
@@ -246,7 +215,6 @@ public class GameController : MonoBehaviour
 
             for (int i = lowerBound; i <= upperBound; ++i) 
             {
-
                 point.x = i;
                 point.y = p1.y;
 
@@ -275,67 +243,6 @@ public class GameController : MonoBehaviour
         newCube.transform.parent = cubesParent;
     }
 
-    public void FillWithCubes(List<Vector2Int> turningPoints)
-    {
-        AddEndPoint(turningPoints);
-
-        Vector2Int matrixIndex; // cube matrix index
-
-        for (int i = 0; i < turningPoints.Count; ++i)
-        {
-            matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
-
-            if (matrixIndex.x < M - 2)
-                ++matrixIndex.x;
-
-            if (matrixIndex.y < N - 2)
-                ++matrixIndex.y;
-
-            BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
-        }
-    }
-
-    private void BoundaryFill(int m, int n, TileStatus fill_color, TileStatus boundary_color)
-    {
-        if (m >= M || m < 0 || n >= N || n < 0)
-            return;
-
-        if (status[m, n] != TileStatus.Wall &&
-            status[m, n] != fill_color)
-        {
-            FillWithCube(m, n, fill_color);
-
-            BoundaryFill(m + 1, n, fill_color, boundary_color);
-            BoundaryFill(m, n + 1, fill_color, boundary_color);
-            BoundaryFill(m - 1, n, fill_color, boundary_color);
-            BoundaryFill(m, n - 1, fill_color, boundary_color);
-        }
-    }
-
-    private void FillWithCube(int m, int n, TileStatus fill_color)
-    {
-        status[m, n] = fill_color;
-        Vector2Int position = ConvertMatrixIndexToPosition(new Vector2Int(m, n));
-        GameObject newCube = FillingCubePool.instance.GetFillingCube();
-
-        newCube.transform.position = new Vector3(position.x, 0, position.y);
-        newCube.transform.parent = cubesParent;
-    }
-
-    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
-    {
-        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
-        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
-        return matrixIndex;
-    }
-
-    public Vector2Int ConvertMatrixIndexToPosition(Vector2Int matrixIndex)
-    {
-        // (x, y) = (n, M - m - 1) // (MxN matrix) 
-        Vector2Int positionIndex = new Vector2Int(matrixIndex.y, M - matrixIndex.x - 1);
-        return positionIndex;
-    }
-
     public void PrintMatrix()
     {
         for (int i = 0; i < M; ++i)
@@ -347,6 +254,13 @@ public class GameController : MonoBehaviour
 
             Debug.Log("####################################");   
         }
+    }
+
+    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
+    {
+        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
+        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
+        return matrixIndex;
     }
 
 }
