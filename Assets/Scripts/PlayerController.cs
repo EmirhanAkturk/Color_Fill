@@ -15,6 +15,15 @@ public class PlayerController : MonoBehaviour
         MoveRight = 4,
     }
 
+    public enum FillDirection
+    {
+        FillUp = 1,
+        FillDown = 2,
+        FillLeft = 3,
+        FillRight = 4,
+    }
+
+
     [Header("Player Movement")]
     [SerializeField]
     float moveTime = 4;
@@ -65,11 +74,11 @@ public class PlayerController : MonoBehaviour
             MovePlayer();
         }
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
         //if (other.gameObject.CompareTag("TailCube"))
-            //GameManager.instance.LevelFail();
+        //GameManager.instance.LevelFail();
     }
 
     private void TouchControl()
@@ -215,7 +224,7 @@ public class PlayerController : MonoBehaviour
 
         return false;
     }
-    
+
     private void HittedTail()
     {
         foreach (GameObject cube in tailCubes)
@@ -236,7 +245,7 @@ public class PlayerController : MonoBehaviour
         bool isNextTileFilled = LevelController.instance.IsTileFilled(nextMatrixIndex);
         bool isNextTileWall = LevelController.instance.IsTileWall(nextMatrixIndex);
 
-        if(isTileFilled)
+        if (isTileFilled)
             turningPoints.Clear();
 
         if (isNextTileWall || isNextTileFilled)
@@ -252,7 +261,7 @@ public class PlayerController : MonoBehaviour
             UpdateTailStatus();
 
             if (!turningPoints.Contains(currentPosition))
-                    AddTurningPoint();
+                AddTurningPoint();
 
             //if (turningPoints.Count > 1) // todo delete this
             //{
@@ -313,21 +322,95 @@ public class PlayerController : MonoBehaviour
 
     public void FillWithCubes(List<Vector2Int> turningPoints)
     {
-
         Vector2Int matrixIndex; // cube matrix index
         Vector2Int position; // cube matrix index
 
+        Vector2Int point1, point2;
+
+        // filling distances  distances
+        int upDistance, downDistance, leftDistance, rightDistance;
+        int fillingDistance;
+
         for (int i = 0; i < turningPoints.Count; ++i)
         {
-            matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
 
-            if (matrixIndex.x < M - 2)
-                ++matrixIndex.x;
+            if (turningPoints.Count == 2)
+            {
+                point1 = turningPoints[0];
+                point2 = turningPoints[1];
 
-            if (matrixIndex.y < N - 2)
-                ++matrixIndex.y;
+                position = (point1 + point2) / 2;
 
-            BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
+                //Debug.Log(position);
+                //upDistance = GetFillDistance(position, FillDirection.FillUp);
+                //downDistance = GetFillDistance(position, FillDirection.FillDown);
+
+                //rightDistance = GetFillDistance(position, FillDirection.FillRight);
+                //leftDistance = GetFillDistance(position, FillDirection.FillLeft);
+
+                //Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
+
+                if (point1.y == point2.y) // horizontal line
+                {
+                    Debug.Log($"Point1:{point1}, Point2: {point2}");
+
+                    upDistance = GetFillDistance(position, FillDirection.FillUp);
+                    downDistance = GetFillDistance(position, FillDirection.FillDown);
+                    
+                    if( upDistance > downDistance)
+                    {
+                        --position.y;
+                        fillingDistance = downDistance;
+                    }
+
+                    else
+                    {
+                        ++position.y;
+                        fillingDistance = upDistance;
+                    }
+
+                    point1.y = position.y;
+                    point2.y = position.y;
+                }
+                else // verticle line
+                {
+                    rightDistance = GetFillDistance(position, FillDirection.FillRight);
+                    leftDistance = GetFillDistance(position, FillDirection.FillLeft);
+
+                    if (rightDistance > leftDistance)
+                    {
+                        --position.x;
+                        fillingDistance = leftDistance;
+                    }
+
+                    else
+                    {
+                        ++position.x;
+                        fillingDistance = rightDistance;
+                    }
+
+                    point1.x = position.x;
+                    point2.x = position.x;
+                }
+
+                Vector2Int matrixIndex1 = ConvertPositionToMatrixIndex(point1);
+                Vector2Int matrixIndex2 = ConvertPositionToMatrixIndex(point2);
+
+                if(fillingDistance > 0) { 
+                    BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
+                    BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
+                }
+            }
+
+            //matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
+
+            //if (matrixIndex.x < M - 2)
+            //    ++matrixIndex.x;
+
+            //if (matrixIndex.y < N - 2)
+            //    ++matrixIndex.y;
+
+            //BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
         }
     }
 
@@ -400,7 +483,7 @@ public class PlayerController : MonoBehaviour
         Vector2Int positionIndex = new Vector2Int(matrixIndex.y, M - matrixIndex.x - 1);
         return positionIndex;
     }
-  
+
     private Vector2Int GetNextPosition(Vector2Int currentPosition)
     {
         Vector2Int newPosition;
@@ -429,6 +512,82 @@ public class PlayerController : MonoBehaviour
         }
 
         return newPosition;
+    }
+
+    private int GetFillDistance(Vector2Int currentPosition, FillDirection moveDirection)
+    {
+        Vector2Int matrixIndex = ConvertPositionToMatrixIndex(currentPosition);
+        bool isTileWall, isTileFilled;
+        int fillDistance = 0;
+
+        switch (moveDirection)
+        {
+            case FillDirection.FillUp:
+                {
+                    for (int i = matrixIndex.x - 1; i >= 0; --i)
+                    {
+                        isTileWall = LevelController.instance.IsTileWall(new Vector2Int(i, matrixIndex.y));
+                        isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(i, matrixIndex.y));
+
+                        if (/*isTileWall ||*/ isTileFilled)
+                            break;
+                        else
+                            ++fillDistance;
+                    }
+
+                    return fillDistance;
+                }
+
+            case FillDirection.FillDown:
+                {
+                    for (int i = matrixIndex.x + 1; i < M; ++i)
+                    {
+                        isTileWall = LevelController.instance.IsTileWall(new Vector2Int(i, matrixIndex.y));
+                        isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(i, matrixIndex.y));
+
+                        if (/*isTileWall || */isTileFilled)
+                            break;
+                        else
+                            ++fillDistance;
+                    }
+
+                    return fillDistance;
+                }
+
+            case FillDirection.FillRight:
+                {
+                    for (int i = matrixIndex.y + 1; i < N; ++i)
+                    {
+                        isTileWall = LevelController.instance.IsTileWall(new Vector2Int(matrixIndex.x, i));
+                        isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(matrixIndex.x, i));
+
+                        if (/*isTileWall || */isTileFilled)
+                            break;
+                        else
+                            ++fillDistance;
+                    }
+
+                    return fillDistance;
+                }
+
+            case FillDirection.FillLeft:
+                {
+                    for (int i = matrixIndex.y - 1; i >= 0; --i)
+                    {
+                        isTileWall = LevelController.instance.IsTileWall(new Vector2Int(matrixIndex.x, i));
+                        isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(matrixIndex.x, i));
+
+                        if (/*isTileWall ||*/ isTileFilled)
+                            break;
+                        else
+                            ++fillDistance;
+                    }
+
+                    return fillDistance;
+                }
+        }
+
+        return 0;
     }
 
     private float GetLimitDistance(bool isVerticle, float distance)
