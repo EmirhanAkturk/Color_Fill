@@ -13,6 +13,8 @@ public class ViewManager : MonoBehaviour
     [SerializeField]
     GameObject losePanel;
 
+    private int currentSceneIndex;
+
     private void OnEnable()
     {
         GameManager.winLoseListener += OnWinLoseListener;
@@ -27,6 +29,8 @@ public class ViewManager : MonoBehaviour
     {
         losePanel?.SetActive(false);
         winPanel?.SetActive(false);
+
+        currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     private void OnWinLoseListener(bool isWin)
@@ -52,13 +56,12 @@ public class ViewManager : MonoBehaviour
         int prevLevel = PlayerPrefs.GetInt("CurrentLevelNumber");
         PlayerPrefs.SetInt("CurrentLevelNumber", ++prevLevel);
 
-        int currentIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentIndex + 1);
+        SceneManager.LoadScene(currentSceneIndex /*+ 1*/); // todo uncomment "+ 1"
     }
 
     public void RetryLevel()
     {
-        int currentIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentIndex);
+
+        SceneManager.LoadScene(currentSceneIndex);
     }
 }

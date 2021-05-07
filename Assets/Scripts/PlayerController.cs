@@ -224,35 +224,47 @@ public class PlayerController : MonoBehaviour
         tailCubes.Clear();
     }
 
-    private void CheckIndoorArea(Vector3 currentMovePosition)
+    private void CheckIndoorArea(Vector3 movePosition)
     {
-        Vector2Int currentPosition = new Vector2Int((int)currentMovePosition.x, (int)currentMovePosition.z);
+        Vector2Int currentPosition = new Vector2Int((int)movePosition.x, (int)movePosition.z);
         Vector2Int nextPosition = GetNextPosition(currentPosition);
 
         Vector2Int matrixIndex = ConvertPositionToMatrixIndex(currentPosition);
         Vector2Int nextMatrixIndex = ConvertPositionToMatrixIndex(nextPosition);
 
         bool isTileFilled = LevelController.instance.IsTileFilled(matrixIndex);
-        bool isTileWall = LevelController.instance.IsTileWall(nextMatrixIndex);
+        bool isNextTileFilled = LevelController.instance.IsTileFilled(nextMatrixIndex);
+        bool isNextTileWall = LevelController.instance.IsTileWall(nextMatrixIndex);
 
-        if (isTileWall || isTileFilled)
+        if(isTileFilled)
+            turningPoints.Clear();
+
+        if (isNextTileWall || isNextTileFilled)
         {
-            AddCubeToTrail(currentMovePosition);
+            //if(tailCubes.Count > 1) //todo delete this
+            //    Debug.Log("Before Last item in tailCubes: " + tailCubes[tailCubes.Count - 1].transform.position +"," + tailCubes.Count);
+
+            AddCubeToTrail(movePosition);
+
+            //if (tailCubes.Count > 1) //todo delete this
+            //    Debug.Log("After Last item in tailCubes: " + tailCubes[tailCubes.Count - 1].transform.position + "," + tailCubes.Count);
+
             UpdateTailStatus();
 
             if (!turningPoints.Contains(currentPosition))
-            {
-                AddTurningPoint();
-            }
+                    AddTurningPoint();
+
+            //if (turningPoints.Count > 1) // todo delete this
+            //{
+            //    print("###################");
+            //    foreach (var point in turningPoints)
+            //        print(point);
+            //    print("###################");
+            //}
 
             //GameController.instance.AddEndPoint(turningPoints);
 
             FillWithCubes(turningPoints);
-
-            //print("###################");
-            //foreach (var point in turningPoints)
-            //    print(LevelController.instance.ConvertPositionToMatrixIndex(point));
-            //print("###################");
 
             turningPoints.Clear();
         }
@@ -265,6 +277,9 @@ public class PlayerController : MonoBehaviour
 
         if (LevelController.instance.IsTileEmpty(matrixIndex))
         {
+            if (tailCubes.Count == 0 && !turningPoints.Contains(position))
+                turningPoints.Add(position);
+
             GameObject newCube = FillingCubePool.instance.GetFillingCube();
             newCube.transform.position = cubePosition;
             newCube.transform.localScale = tailCubeScale;
@@ -274,6 +289,7 @@ public class PlayerController : MonoBehaviour
             newCube.transform.parent = cubesParent;
 
             LevelController.instance.SetTileBeingFilled(matrixIndex);
+
         }
     }
 
@@ -297,9 +313,9 @@ public class PlayerController : MonoBehaviour
 
     public void FillWithCubes(List<Vector2Int> turningPoints)
     {
-        AddEndPoint(turningPoints);
 
         Vector2Int matrixIndex; // cube matrix index
+        Vector2Int position; // cube matrix index
 
         for (int i = 0; i < turningPoints.Count; ++i)
         {
@@ -320,8 +336,7 @@ public class PlayerController : MonoBehaviour
         if (m >= M || m < 0 || n >= N || n < 0)
             return;
 
-        if (!LevelController.instance.IsTileWall(new Vector2Int(m, n)) &&
-            !LevelController.instance.IsTileFilled(new Vector2Int(m, n)))
+        if (LevelController.instance.IsTileEmpty(new Vector2Int(m, n)))
         {
             FillWithCube(m, n, fill_color);
 
