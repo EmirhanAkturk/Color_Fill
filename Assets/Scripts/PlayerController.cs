@@ -328,90 +328,116 @@ public class PlayerController : MonoBehaviour
         Vector2Int point1, point2;
 
         // filling distances  distances
-        int upDistance, downDistance, leftDistance, rightDistance;
-        int fillingDistance;
+        int maxUpDistance = 0, maxDownDistance = 0, maxLeftDistance = 0, maxRightDistance = 0;
+        int fillingDistance, distance1, distance2;
 
-        for (int i = 0; i < turningPoints.Count; ++i)
+        Debug.Log(turningPoints.Count);
+
+        if (turningPoints.Count % 2 == 0)
         {
-
-            if (turningPoints.Count == 2)
-            {
+            if(turningPoints.Count == 2) 
+            { 
                 point1 = turningPoints[0];
                 point2 = turningPoints[1];
-
-                position = (point1 + point2) / 2;
-
-                //Debug.Log(position);
-                //upDistance = GetFillDistance(position, FillDirection.FillUp);
-                //downDistance = GetFillDistance(position, FillDirection.FillDown);
-
-                //rightDistance = GetFillDistance(position, FillDirection.FillRight);
-                //leftDistance = GetFillDistance(position, FillDirection.FillLeft);
-
-                //Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
-
-                if (point1.y == point2.y) // horizontal line
-                {
-                    Debug.Log($"Point1:{point1}, Point2: {point2}");
-
-                    upDistance = GetFillDistance(position, FillDirection.FillUp);
-                    downDistance = GetFillDistance(position, FillDirection.FillDown);
-                    
-                    if( upDistance > downDistance)
-                    {
-                        --position.y;
-                        fillingDistance = downDistance;
-                    }
-
-                    else
-                    {
-                        ++position.y;
-                        fillingDistance = upDistance;
-                    }
-
-                    point1.y = position.y;
-                    point2.y = position.y;
-                }
-                else // verticle line
-                {
-                    rightDistance = GetFillDistance(position, FillDirection.FillRight);
-                    leftDistance = GetFillDistance(position, FillDirection.FillLeft);
-
-                    if (rightDistance > leftDistance)
-                    {
-                        --position.x;
-                        fillingDistance = leftDistance;
-                    }
-
-                    else
-                    {
-                        ++position.x;
-                        fillingDistance = rightDistance;
-                    }
-
-                    point1.x = position.x;
-                    point2.x = position.x;
-                }
-
-                Vector2Int matrixIndex1 = ConvertPositionToMatrixIndex(point1);
-                Vector2Int matrixIndex2 = ConvertPositionToMatrixIndex(point2);
-
-                if(fillingDistance > 0) { 
-                    BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
-                    BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
-                }
+            }
+            else
+            {
+                point1 = turningPoints[0]; // first point
+                point2 = turningPoints[turningPoints.Count - 2]; // second to last point
             }
 
-            //matrixIndex = ConvertPositionToMatrixIndex(turningPoints[i]);
+            position = (point1 + point2) / 2;
 
-            //if (matrixIndex.x < M - 2)
-            //    ++matrixIndex.x;
+            #region temp
+            /*
+            todo delete lines in comment below
+            Debug.Log(position);
 
-            //if (matrixIndex.y < N - 2)
-            //    ++matrixIndex.y;
+            distance1 = GetFillDistance(point1, FillDirection.FillUp);
+            distance2 = GetFillDistance(point2, FillDirection.FillUp);
+            minUpDistance = distance1 < distance2 ? distance1 : distance2;
 
-            //BoundaryFill(matrixIndex.x, matrixIndex.y, TileStatus.Filled, TileStatus.Wall);
+            distance1 = GetFillDistance(point1, FillDirection.FillDown);
+            distance2 = GetFillDistance(point2, FillDirection.FillDown);
+            minDownDistance = distance1 < distance2 ? distance1 : distance2;
+
+            distance1 = GetFillDistance(point1, FillDirection.FillRight);
+            distance2 = GetFillDistance(point2, FillDirection.FillRight);
+            minRightDistance = distance1 < distance2 ? distance1 : distance2;
+
+            distance1 = GetFillDistance(point1, FillDirection.FillLeft);
+            distance2 = GetFillDistance(point2, FillDirection.FillLeft);
+            minLeftDistance = distance1 < distance2 ? distance1 : distance2;
+
+            Debug.Log($"up:{minUpDistance}, down:{minDownDistance}, right: {minRightDistance}, left: {minLeftDistance}");
+            */
+            #endregion
+
+            if (point1.y == point2.y) // horizontal line
+            {
+                Debug.Log($"Point1:{point1}, Point2: {point2}");
+
+                distance1 = GetFillDistance(point1, FillDirection.FillUp);
+                distance2 = GetFillDistance(point2, FillDirection.FillUp);
+                maxUpDistance = distance1 > distance2 ? distance1 : distance2;
+
+                distance1 = GetFillDistance(point1, FillDirection.FillDown);
+                distance2 = GetFillDistance(point2, FillDirection.FillDown);
+                maxDownDistance = distance1 > distance2 ? distance1 : distance2;
+
+                if ( maxUpDistance > maxDownDistance)
+                {
+                    --position.y;
+                    fillingDistance = maxDownDistance;
+                }
+
+                else
+                {
+                    ++position.y;
+                    fillingDistance = maxUpDistance;
+                }
+
+                point1.y = position.y;
+                point2.y = position.y;
+            }
+            else // verticle line
+            {
+                distance1 = GetFillDistance(point1, FillDirection.FillRight);
+                distance2 = GetFillDistance(point2, FillDirection.FillRight);
+                maxRightDistance = distance1 > distance2 ? distance1 : distance2;
+
+                distance1 = GetFillDistance(point1, FillDirection.FillLeft);
+                distance2 = GetFillDistance(point2, FillDirection.FillLeft);
+                maxLeftDistance = distance1 > distance2 ? distance1 : distance2;
+
+                if (maxRightDistance > maxLeftDistance)
+                {
+                    --position.x;
+                    fillingDistance = maxLeftDistance;
+                }
+
+                else
+                {
+                    ++position.x;
+                    fillingDistance = maxRightDistance;
+                }
+
+                point1.x = position.x;
+                point2.x = position.x;
+
+            }
+
+            Vector2Int matrixIndex1 = ConvertPositionToMatrixIndex(point1);
+            Vector2Int matrixIndex2 = ConvertPositionToMatrixIndex(point2);
+
+            Debug.Log($"up:{maxUpDistance}, down:{maxDownDistance}, right: {maxRightDistance}, left: {maxLeftDistance}");
+
+            if (fillingDistance > 0) { 
+                BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
+                BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
+            }
         }
+
     }
 
     private void BoundaryFill(int m, int n, TileStatus fill_color, TileStatus boundary_color)
@@ -529,7 +555,7 @@ public class PlayerController : MonoBehaviour
                         isTileWall = LevelController.instance.IsTileWall(new Vector2Int(i, matrixIndex.y));
                         isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(i, matrixIndex.y));
 
-                        if (/*isTileWall ||*/ isTileFilled)
+                        if (isTileWall || isTileFilled)
                             break;
                         else
                             ++fillDistance;
@@ -545,7 +571,7 @@ public class PlayerController : MonoBehaviour
                         isTileWall = LevelController.instance.IsTileWall(new Vector2Int(i, matrixIndex.y));
                         isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(i, matrixIndex.y));
 
-                        if (/*isTileWall || */isTileFilled)
+                        if (isTileWall || isTileFilled)
                             break;
                         else
                             ++fillDistance;
@@ -561,7 +587,7 @@ public class PlayerController : MonoBehaviour
                         isTileWall = LevelController.instance.IsTileWall(new Vector2Int(matrixIndex.x, i));
                         isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(matrixIndex.x, i));
 
-                        if (/*isTileWall || */isTileFilled)
+                        if (isTileWall || isTileFilled)
                             break;
                         else
                             ++fillDistance;
@@ -577,7 +603,7 @@ public class PlayerController : MonoBehaviour
                         isTileWall = LevelController.instance.IsTileWall(new Vector2Int(matrixIndex.x, i));
                         isTileFilled = LevelController.instance.IsTileFilled(new Vector2Int(matrixIndex.x, i));
 
-                        if (/*isTileWall ||*/ isTileFilled)
+                        if (isTileWall || isTileFilled)
                             break;
                         else
                             ++fillDistance;
