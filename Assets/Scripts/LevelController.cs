@@ -243,6 +243,13 @@ public class LevelController : MonoBehaviour
         newCube.transform.parent = cubesParent;
     }
 
+    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
+    {
+        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
+        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
+        return matrixIndex;
+    }
+
     public void PrintMatrix()
     {
         for (int i = 0; i < M; ++i)
@@ -255,12 +262,4 @@ public class LevelController : MonoBehaviour
             Debug.Log("####################################");   
         }
     }
-
-    public Vector2Int ConvertPositionToMatrixIndex(Vector2Int point)
-    {
-        // (m, n) = (M - y - 1 , x)   // (MxN matrix) 
-        Vector2Int matrixIndex = new Vector2Int(M - point.y - 1, point.x);
-        return matrixIndex;
-    }
-
 }

@@ -19,9 +19,4 @@ public class EnemyController : MonoBehaviour
         else if (other.gameObject.CompareTag("TailCube"))
             GameManager.instance.LevelFail();
     }
-
-    //private void OnCollisionEnter(Collision collision)
-    //{
-        
-    //}
 }
