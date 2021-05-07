@@ -49,6 +49,8 @@ public class LevelController : MonoBehaviour
     public int GetM() { return M; }
     public int GetN() { return N; }
 
+    public int GetEmptyTileCount() { return emptyTileCount; }
+
     public bool IsTileEmpty(Vector2Int matrixIndex)
     {
         return status[matrixIndex.x, matrixIndex.y] == TileStatus.Empty;
