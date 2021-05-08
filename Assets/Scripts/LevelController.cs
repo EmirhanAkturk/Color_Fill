@@ -239,14 +239,7 @@ public class LevelController : MonoBehaviour
 
     private void CreateCube(GameObject cube, ref Vector2Int point, ref GameObject newCube, Vector2Int matrixIndex)
     {
-        if (cube.tag == "FillingCube")
-        {
-            newCube = Instantiate(fillingCube, new Vector3(point.x, 0, point.y), Quaternion.identity);
-            //newCube = FillingCubePool.instance.GetFillingCube();
-            //newCube.transform.position = new Vector3(point.x, 0, point.y);
-            SetTileFilled(matrixIndex);
-        }
-        else if (cube.tag == "WallCube")
+        if (cube.tag == "WallCube")
         {
             newCube = Instantiate(cube, new Vector3(point.x, 0, point.y), Quaternion.identity);
             SetTileWall(matrixIndex);

@@ -154,7 +154,69 @@ public class FillController : MonoBehaviour
                 BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
             }
         }
+        else if (turningPoints.Count % 2 == 0)
+        {
+            FillDirection verticleFillDirection1, verticleFillDirection2;
+            FillDirection horizontalFillDirection1, horizontalFillDirection2;
 
+            point1 = turningPoints[0]; // first point
+            point2 = turningPoints[turningPoints.Count - 2]; // second to last point
+
+            if (point1.x > point2.x) 
+            {
+                horizontalFillDirection1 = FillDirection.FillLeft;
+                horizontalFillDirection2 = FillDirection.FillRight;
+            }
+            else
+            {
+                horizontalFillDirection1 = FillDirection.FillRight;
+                horizontalFillDirection2 = FillDirection.FillLeft;
+            }
+
+            if(point1.y > point2.y)
+            {
+                verticleFillDirection1 = FillDirection.FillDown;
+                verticleFillDirection2 = FillDirection.FillUp;
+            }
+            else
+            {
+                verticleFillDirection1 = FillDirection.FillUp;
+                verticleFillDirection2 = FillDirection.FillDown;
+            }
+
+            distance1 = Mathf.Abs(point1.x - point2.x);
+            distance2 = Mathf.Abs(point1.y - point2.y);
+
+            fillingDistance = distance1 < distance2 ? distance1 : distance2;
+
+            Vector2Int point3 = turningPoints[1];
+            Vector2Int point4 = turningPoints[3];
+
+            Vector2Int matrixIndex3;
+            Vector2Int matrixIndex4;
+
+            if (point3.x == point1.x)
+                matrixIndex3 = GetFillMatrixIndex(point3, verticleFillDirection2, horizontalFillDirection1);
+            else
+                matrixIndex3 = GetFillMatrixIndex(point3, verticleFillDirection1, horizontalFillDirection2);
+
+            if (point4.x == point2.x)
+                matrixIndex4 = GetFillMatrixIndex(point4, verticleFillDirection1, horizontalFillDirection2);
+            else
+                matrixIndex4 = GetFillMatrixIndex(point4, verticleFillDirection2, horizontalFillDirection1);
+
+            matrixIndex1 = GetFillMatrixIndex(point1, verticleFillDirection1, horizontalFillDirection1); // point1: turningPoints[0]
+            matrixIndex2 = GetFillMatrixIndex(point2, verticleFillDirection2, horizontalFillDirection2); // point2: turningPoints[2]
+           
+            if (fillingDistance > 1)
+            {
+                BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
+                BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
+                BoundaryFill(matrixIndex3.x, matrixIndex3.y, TileStatus.Filled, TileStatus.Wall);
+                BoundaryFill(matrixIndex4.x, matrixIndex4.y, TileStatus.Filled, TileStatus.Wall);
+            }
+
+        }
         else if (turningPoints.Count > 1) // Situations other than 2 turning points
         {
             midPoint = turningPoints[turningPoints.Count / 2];
@@ -237,16 +299,16 @@ public class FillController : MonoBehaviour
         {
             //Check for no out of range
             if (matrixIndex.x == 1 && matrixVerticleChange == -1)
-                matrixVerticleChange = 0;
+                matrixVerticleChange = 1;
 
             else if (matrixIndex.x == M - 2 && matrixVerticleChange == 1)
-                matrixVerticleChange = 0;
+                matrixVerticleChange = -1;
 
             if (matrixIndex.y == 1 && matrixHorizontalChange == -1)
-                matrixHorizontalChange = 0;
+                matrixHorizontalChange = 1;
 
             else if (matrixIndex.y == N - 2 && matrixHorizontalChange == 1)
-                matrixHorizontalChange = 0;
+                matrixHorizontalChange = -1;
 
             matrixIndex.x += matrixVerticleChange;
             matrixIndex.y += matrixHorizontalChange;
