@@ -49,14 +49,13 @@ public class FillController : MonoBehaviour
         FillDirection verticleFillDirection = FillDirection.FillDown;
         FillDirection horizontalFillDirection = FillDirection.FillRight;
 
-        if (turningPoints.Count == 2 /*% 2 == 0*/)
+        if (turningPoints.Count == 2 )
         {
             point1 = turningPoints[0];
             point2 = turningPoints[1];
 
             if (point1.y == point2.y) // horizontal line
             {
-                //Debug.Log($"Point1:{point1}, Point2: {point2}");
                 distance1 = GetFillDistance(point1, FillDirection.FillUp);
                 distance2 = GetFillDistance(point2, FillDirection.FillUp);
                 upDistance = distance1 > distance2 ? distance1 : distance2;
@@ -149,8 +148,11 @@ public class FillController : MonoBehaviour
                 }
             }
 
-            BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
-            BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
+            if(fillingDistance > 1) 
+            { 
+                BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
+                BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
+            }
         }
 
         else if (turningPoints.Count > 1) // Situations other than 2 turning points

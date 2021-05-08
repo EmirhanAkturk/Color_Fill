@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4086018d22eb44c408a856fe8a59ec68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 7.5
+  moveTime: 10
   cubesParent: {fileID: 0}
   fillingCube: {fileID: 6169623734096852669, guid: cae7bb67a00538a498ae25152b6fc3db,
     type: 3}
