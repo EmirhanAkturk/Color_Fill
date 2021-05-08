@@ -12,6 +12,9 @@ public class LevelController : MonoBehaviour
         Filled = 3,
     }
 
+    [SerializeField]
+    int currentLevel;
+
     public static LevelController instance;
 
     [Header("Plane values")]
@@ -38,8 +41,8 @@ public class LevelController : MonoBehaviour
     Transform cubesParent;
 
     [Header("Wall Points")]
-    [SerializeField]            //todo delete fillPoints
-    List<Vector2Int> wallPoints, fillPoints;
+    [SerializeField]
+    List<Vector2Int> level3WallPoints;
 
     TileStatus[ , ] status;
     int emptyTileCount;
@@ -91,7 +94,6 @@ public class LevelController : MonoBehaviour
     }
     #endregion
 
-
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -104,28 +106,29 @@ public class LevelController : MonoBehaviour
     private void Start()
     {
         emptyTileCount = M * N;
-
         status = new TileStatus[M, N];
-
         GridEditor();
-        DrawWalls(Vector2Int.zero, new Vector2Int(M-1, N-1));
 
-        DrawWalls(wallPoints[0], wallPoints[1]);
+        //draw the outermost wall
+        DrawWalls(Vector2Int.zero, new Vector2Int(M - 1, N - 1));
 
-        //AddEndPoint(turningPoints);
-        //DrawLines(turningPoints, fillingCube, false);
-
-        //AddEndPoint(turningPoints2);
-        //DrawLines(turningPoints2, wallCube, false);
-
-        //FillWithCubes(turningPoints);
-        //PrintMatrix();
+        //Draw existing level specific walls
+        DrawLevelWalls();
     }
 
     private void GridEditor()
     {
         Material planeGridMaterial = planeMeshRender.material;
         planeGridMaterial.mainTextureScale = new Vector2(M, N);
+    }
+
+    private void DrawLevelWalls()
+    {
+        if(currentLevel == 3)
+        {
+            for (int i = 0; i < level3WallPoints.Count - 1; i = i + 2)
+                DrawWalls(level3WallPoints[i], level3WallPoints[i + 1]);
+        }
     }
 
     private void DrawWalls(Vector2Int corner1, Vector2Int corner2)

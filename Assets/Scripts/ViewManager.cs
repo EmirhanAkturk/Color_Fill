@@ -56,12 +56,11 @@ public class ViewManager : MonoBehaviour
         int prevLevel = PlayerPrefs.GetInt("CurrentLevelNumber");
         PlayerPrefs.SetInt("CurrentLevelNumber", ++prevLevel);
 
-        SceneManager.LoadScene(currentSceneIndex /*+ 1*/); // todo uncomment "+ 1"
+        SceneManager.LoadScene((currentSceneIndex + 1) % SceneManager.sceneCountInBuildSettings); 
     }
 
     public void RetryLevel()
     {
-
         SceneManager.LoadScene(currentSceneIndex);
     }
 }

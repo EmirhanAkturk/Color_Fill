@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (PlayerPrefs.GetInt("CurrentLevelNumber") == 0)
+            PlayerPrefs.SetInt("CurrentLevelNumber", 1);
+
         isPlaying = true;
     }
 
