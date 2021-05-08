@@ -51,16 +51,8 @@ public class FillController : MonoBehaviour
 
         if (turningPoints.Count == 2 /*% 2 == 0*/)
         {
-            if (turningPoints.Count == 2)
-            {
-                point1 = turningPoints[0];
-                point2 = turningPoints[1];
-            }
-            else
-            {
-                point1 = turningPoints[0]; // first point
-                point2 = turningPoints[turningPoints.Count - 2]; // second to last point
-            }
+            point1 = turningPoints[0];
+            point2 = turningPoints[1];
 
             if (point1.y == point2.y) // horizontal line
             {
@@ -161,7 +153,7 @@ public class FillController : MonoBehaviour
             BoundaryFill(matrixIndex2.x, matrixIndex2.y, TileStatus.Filled, TileStatus.Wall);
         }
 
-        else if (turningPoints.Count > 1) // situations with an odd number of turning points.
+        else if (turningPoints.Count > 1) // Situations other than 2 turning points
         {
             midPoint = turningPoints[turningPoints.Count / 2];
 
@@ -204,7 +196,7 @@ public class FillController : MonoBehaviour
             int innerSpace = horizontalLength * verticleLength;
             int outerSpace = LevelController.instance.GetEmptyTileCount() - innerSpace;
 
-            Debug.Log("Inner space: " + innerSpace + ", outerSpace: " + outerSpace);
+            //Debug.Log("Inner space: " + innerSpace + ", outerSpace: " + outerSpace);
 
             //reverse  fill direction
             if (innerSpace > outerSpace)
@@ -221,7 +213,7 @@ public class FillController : MonoBehaviour
             }
 
             matrixIndex1 = GetFillMatrixIndex(midPoint, verticleFillDirection, horizontalFillDirection);
-            Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
+            //Debug.Log($"up:{upDistance}, down:{downDistance}, right: {rightDistance}, left: {leftDistance}");
 
             BoundaryFill(matrixIndex1.x, matrixIndex1.y, TileStatus.Filled, TileStatus.Wall);
         }
